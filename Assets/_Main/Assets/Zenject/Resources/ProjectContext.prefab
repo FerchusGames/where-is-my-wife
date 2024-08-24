@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5200652602990322857}
   - component: {fileID: 3611518299451615160}
+  - component: {fileID: 7138242336572461389}
   m_Layer: 0
   m_Name: ProjectContext
   m_TagString: Untagged
@@ -45,7 +46,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _scriptableObjectInstallers: []
-  _monoInstallers: []
+  _monoInstallers:
+  - {fileID: 7138242336572461389}
   _installerPrefabs: []
   _findSiblingMonoInstallers: 0
   _parentNewObjectsUnderContext: 1
@@ -62,3 +64,16 @@ MonoBehaviour:
       _missingHandlerDefaultResponse: 2
       _requireStrictUnsubscribe: 0
       _defaultAsyncTickPriority: 1
+--- !u!114 &7138242336572461389
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6810186635928012252}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 596f944d886aee044998e65df8e06c23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _playerProperties: {fileID: 11400000, guid: d010f12137def274c969cdb43a342e70, type: 2}
