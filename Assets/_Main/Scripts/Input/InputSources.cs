@@ -4,11 +4,16 @@ using UnityEngine;
 
 namespace WhereIsMyWife.Managers
 {
-    public interface IPlayerInput
+    public interface IPlayerInputEvent
     {
         IObservable<Unit> JumpStartAction { get; }
+        IObservable<Unit> JumpEndAction { get; }
         IObservable<float> RunAction { get; }
-        IObservable<Vector2> DashStartAction { get; }
+        IObservable<Vector2> DashAction { get; }
+        IObservable<Vector2> UseItemAction { get; }
+        IObservable<Unit> HookStartAction { get; }
+        IObservable<Unit> HookEndAction { get; }
+        IObservable<Unit> LookUpAction { get; }
+        IObservable<Unit> GoDownAction { get; }
     }
-
 }

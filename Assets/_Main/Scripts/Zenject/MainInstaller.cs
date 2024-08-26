@@ -20,7 +20,7 @@ namespace WhereIsMyWife
         private void InstallManagerBindings()
         {
             Container.BindInterfacesTo<PlayerManager>().AsSingle();
-            Container.BindInterfacesTo<InputManager>().AsSingle();
+            Container.BindInterfacesTo<InputEventManager>().AsSingle();
         }
 
         private void InstallDatabaseBindings()

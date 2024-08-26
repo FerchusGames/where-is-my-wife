@@ -29,7 +29,7 @@ namespace WhereIsMyWife.Managers
     
     public partial class PlayerManager : IPlayerControllerInput
     {
-        [Inject] private IPlayerInput _playerInput;
+        [Inject] private IPlayerInputEvent _playerInputEvent;
 
         private Subject<float> _jumpStartSubject = new Subject<float>();
         private Subject<Unit> _jumpEndSubject = new Subject<Unit>();
@@ -179,9 +179,9 @@ namespace WhereIsMyWife.Managers
 
         private void SubscribeToObservables()
         {
-            _playerInput.JumpStartAction.Subscribe(ExecuteJumpStartEvent);
-            _playerInput.RunAction.Subscribe(ExecuteRunEvent);
-            _playerInput.DashStartAction.Subscribe(ExecuteDashStartEvent);
+            _playerInputEvent.JumpStartAction.Subscribe(ExecuteJumpStartEvent);
+            _playerInputEvent.RunAction.Subscribe(ExecuteRunEvent);
+            _playerInputEvent.DashAction.Subscribe(ExecuteDashStartEvent);
         }
     }
 
