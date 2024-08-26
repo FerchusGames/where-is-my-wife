@@ -1,6 +1,7 @@
 using System;
 using UniRx;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Zenject;
 
 namespace WhereIsMyWife.Controllers
@@ -8,6 +9,7 @@ namespace WhereIsMyWife.Controllers
     public interface IPlayerControllerInput
     {
         IObservable<float> JumpStart { get; }
+        IObservable<Unit> JumpEnd { get; }
         IObservable<float> Run { get; }
         IObservable<Vector2> DashStart { get; }
         IObservable<Unit> DashEnd { get; }
@@ -20,12 +22,14 @@ namespace WhereIsMyWife.Controllers
 
     public interface IPlayerControllerData
     {
-        Vector2 RigidbodyVelocity { get; }
+       public Vector2 RigidbodyVelocity { get; }
+       public Vector3 GroundCheckPosition { get; }
     }
     
     public partial class PlayerController : IPlayerControllerData
     {
         public Vector2 RigidbodyVelocity => _rigidbody2D.velocity;
+        public Vector3 GroundCheckPosition => _groundCheckTransform.position;
     }
     
     public partial class PlayerController : MonoBehaviour
@@ -34,6 +38,7 @@ namespace WhereIsMyWife.Controllers
         [Inject] private IPlayerControllerEvent _playerControllerEvent;
 
         [SerializeField] private Rigidbody2D _rigidbody2D;
+        [SerializeField] private Transform _groundCheckTransform = null;
         
         private void Start()
         {

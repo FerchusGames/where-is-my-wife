@@ -13,11 +13,13 @@ namespace WhereIsMyWife.Managers
         [Inject] private IPlayerInput _playerInput;
 
         private Subject<float> _jumpStartSubject = new Subject<float>();
+        private Subject<Unit> _jumpEndSubject = new Subject<Unit>();
         private Subject<float> _runSubject = new Subject<float>();
         private Subject<Vector2> _dashStartSubject = new Subject<Vector2>();
         private Subject<Unit> _dashEndSubject = new Subject<Unit>();
 
         public IObservable<float> JumpStart => _jumpStartSubject.AsObservable();
+        public IObservable<Unit> JumpEnd => _jumpEndSubject.AsObservable();
         public IObservable<float> Run => _runSubject.AsObservable();
         public IObservable<Vector2> DashStart => _dashStartSubject.AsObservable();
         public IObservable<Unit> DashEnd => _dashEndSubject.AsObservable();
@@ -75,13 +77,13 @@ namespace WhereIsMyWife.Managers
     {
         [Inject] private IPlayerProperties _playerProperties;
         
-        private float _lastOnGroundTime = 0;
-
         private bool _isJumping = false;
         private bool _isJumpFalling = false;
-        private float _accelerationRate;
-        private float _targetSpeed;
+        private float _accelerationRate = 0;
+        private float _targetSpeed = 0;
+        private float _lastOnGroundTime = 0;
 
+        
         private async UniTaskVoid Dash(Vector2 dashDirection)
         {
             _dashStartSubject.OnNext(dashDirection * _playerProperties.Dash.Speed);

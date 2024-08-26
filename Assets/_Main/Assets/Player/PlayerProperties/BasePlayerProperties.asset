@@ -17,3 +17,4 @@ MonoBehaviour:
   <DashProperties>k__BackingField: {fileID: 11400000, guid: a6bc620f22c23d840961f7282c96cf83, type: 2}
   <CombatProperties>k__BackingField: {fileID: 11400000, guid: 3a3684d1f78c454429e6a5641f6b9fd8, type: 2}
   <GravityProperties>k__BackingField: {fileID: 11400000, guid: 8c4d0c2db350b4449a374a5e388d4c06, type: 2}
+  <CheckProperties>k__BackingField: {fileID: 11400000, guid: a6f1df6aba9d9e6468ba265c1ece69cb, type: 2}
