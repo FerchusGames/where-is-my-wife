@@ -410,11 +410,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 408039819057657938, guid: e8fde86a435cb4e439bb225e10522fbe, type: 3}
   m_PrefabInstance: {fileID: 1038252055932220056}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &1011083879 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 7116818345952157381, guid: e8fde86a435cb4e439bb225e10522fbe, type: 3}
-  m_PrefabInstance: {fileID: 1038252055932220056}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1028957869 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2205077736419873349, guid: b46b81a2fd4792948a71a64c9b53925a, type: 3}
@@ -686,10 +681,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1976224039065479580, guid: e8fde86a435cb4e439bb225e10522fbe, type: 3}
-      propertyPath: _groundCheckTransform
-      value: 
-      objectReference: {fileID: 1011083879}
     - target: {fileID: 2846138476073471522, guid: e8fde86a435cb4e439bb225e10522fbe, type: 3}
       propertyPath: m_Name
       value: Player

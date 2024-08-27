@@ -15,6 +15,7 @@ namespace WhereIsMyWife
             InstallScriptableObjectBindings();
             InstallDatabaseBindings();
             InstallManagerBindings();
+            InstallActionMethods();
         }
 
         private void InstallManagerBindings()
@@ -50,6 +51,11 @@ namespace WhereIsMyWife
             Container.BindInterfacesTo<PlayerGravityProperties>().FromScriptableObject(_playerProperties.GravityProperties).AsSingle();
             Container.BindInterfacesTo<PlayerCombatProperties>().FromScriptableObject(_playerProperties.CombatProperties).AsSingle();
             Container.BindInterfacesTo<PlayerCheckProperties>().FromScriptableObject(_playerProperties.CheckProperties).AsSingle();
+        }
+
+        private void InstallActionMethods()
+        {
+            Container.BindInterfacesTo<RunningMethods>().AsSingle();
         }
     }
 }
