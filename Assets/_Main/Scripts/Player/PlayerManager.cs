@@ -14,6 +14,7 @@ namespace WhereIsMyWife.Managers
         public bool IsJumping();
         public bool IsJumpCut();
         public bool IsJumpFalling();
+        public bool IsOnJumpInputBuffer();
         public bool IsOnGround();
         public bool IsInJumpHang();
     }
@@ -23,6 +24,7 @@ namespace WhereIsMyWife.Managers
         [Inject] private IPlayerProperties _properties;
 
         [Inject] private IRunningMethods _runningMethods;
+        [Inject] private IJumpingMethods _jumpingMethods;
         
         // Movement
         private float _accelerationRate = 0;
@@ -54,10 +56,15 @@ namespace WhereIsMyWife.Managers
         {
             return false;
         }
-        
+
+        public bool IsOnJumpInputBuffer()
+        {
+            return _lastPressedJumpTime >= 0;
+        }
+
         public bool IsOnGround()
         {
-            return true;
+            return _lastOnGroundTime >= 0;
         }
         
         public bool IsInJumpHang()
@@ -85,19 +92,7 @@ namespace WhereIsMyWife.Managers
         
         private void ExecuteJumpStartEvent()
         {
-            _jumpStartSubject.OnNext(GetJumpForce());
-        }
-        
-        private float GetJumpForce()
-        {
-            float force = _properties.Jump.ForceMagnitude;
-
-            if (_controllerData.RigidbodyVelocity.y < 0)
-            {
-                force -= _controllerData.RigidbodyVelocity.y; // To always jump the same amount.
-            }
-
-            return force;
+            _jumpStartSubject.OnNext(_jumpingMethods.GetJumpForce(_controllerData.RigidbodyVelocity.y));
         }
 
         private void ExecuteRunEvent(float runDirection)

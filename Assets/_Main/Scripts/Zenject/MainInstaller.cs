@@ -56,6 +56,7 @@ namespace WhereIsMyWife
         private void InstallActionMethods()
         {
             Container.BindInterfacesTo<RunningMethods>().AsSingle();
+            Container.BindInterfacesTo<JumpingMethods>().AsSingle();
         }
     }
 }
