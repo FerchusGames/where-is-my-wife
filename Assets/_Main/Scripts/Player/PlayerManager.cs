@@ -10,13 +10,16 @@ namespace WhereIsMyWife.Managers
 {
     public interface IPlayerStateIndicator
     {
-        public bool IsFacingRight();
-        public bool IsJumping();
-        public bool IsJumpCut();
-        public bool IsJumpFalling();
+        public bool IsDead { get; }
+        public bool IsFacingRight { get; }
+        public bool IsJumping { get; }
+        public bool IsJumpCut { get; }
+        public bool IsJumpFalling { get; }
         public bool IsOnJumpInputBuffer();
         public bool IsOnGround();
         public bool IsInJumpHang();
+        public bool CanJump();
+        public bool CanJumpCut();
     }
     
     public partial class PlayerManager 
@@ -37,25 +40,11 @@ namespace WhereIsMyWife.Managers
 
     public partial class PlayerManager : IPlayerStateIndicator
     {
-        public bool IsFacingRight()
-        {
-            return false;
-        }
-
-        public bool IsJumping()
-        {
-            return false;
-        }
-
-        public bool IsJumpCut()
-        {
-            return false;
-        }
-
-        public bool IsJumpFalling()
-        {
-            return false;
-        }
+        public bool IsDead { get; private set; } 
+        public bool IsFacingRight { get; private set; } 
+        public bool IsJumping { get; private set; } 
+        public bool IsJumpCut { get; private set; }
+        public bool IsJumpFalling { get; private set; }
 
         public bool IsOnJumpInputBuffer()
         {
@@ -69,8 +58,18 @@ namespace WhereIsMyWife.Managers
         
         public bool IsInJumpHang()
         {
-            return (IsJumping() || IsJumpFalling()) 
+            return (IsJumping || IsJumpFalling) 
                    && Mathf.Abs(_controllerData.RigidbodyVelocity.y) < _properties.Jump.HangTimeThreshold;
+        }
+
+        public bool CanJump()
+        {
+            return _lastOnGroundTime > 0 && !IsJumping;
+        }
+
+        public bool CanJumpCut()
+        {
+            return IsJumping && _controllerData.RigidbodyVelocity.y > 0;
         }
     }
     
@@ -92,9 +91,17 @@ namespace WhereIsMyWife.Managers
         
         private void ExecuteJumpStartEvent()
         {
-            _jumpStartSubject.OnNext(_jumpingMethods.GetJumpForce(_controllerData.RigidbodyVelocity.y));
+            _lastPressedJumpTime = _properties.Jump.InputBufferTime;
         }
 
+        private void ExecuteJumpEndEvent()
+        {
+            if (CanJumpCut())
+            {
+                IsJumpCut = true;
+            }
+        }
+        
         private void ExecuteRunEvent(float runDirection)
         {
             _runSubject.OnNext(_runningMethods.GetRunAcceleration(runDirection, _controllerData.RigidbodyVelocity.x));
@@ -135,6 +142,7 @@ namespace WhereIsMyWife.Managers
         private void SubscribeToObservables()
         {
             _playerInputEvent.JumpStartAction.Subscribe(ExecuteJumpStartEvent);
+            _playerInputEvent.JumpEndAction.Subscribe(ExecuteJumpEndEvent);
             _playerInputEvent.RunAction.Subscribe(ExecuteRunEvent);
             _playerInputEvent.DashAction.Subscribe(ExecuteDashStartEvent);
         }
@@ -145,12 +153,74 @@ namespace WhereIsMyWife.Managers
         public void Tick()
         {
             TickTimers();
+            GroundCheck();
+            JumpChecks();
         }
 
         private void TickTimers()
         {
             _lastOnGroundTime -= Time.deltaTime;
             _lastPressedJumpTime -= Time.deltaTime;
+        }
+        
+        private void GroundCheck()
+        {
+            if (GetGroundCheckOverlapBox() && !IsJumping)
+            {
+                _lastOnGroundTime = _properties.Jump.CoyoteTime;
+            }
+        }
+
+        private Collider2D GetGroundCheckOverlapBox()
+        {
+            return Physics2D.OverlapBox(_controllerData.GroundCheckPosition, _properties.Check.GroundCheckSize, 0,
+                _properties.Check.GroundLayer);
+        }
+        
+        private void JumpChecks()
+        {
+            JumpingCheck();
+            JumpStopCheck();
+
+            if (CanJump() && _lastPressedJumpTime > 0)
+            {
+                IsJumping = true;
+                IsJumpCut = false;
+                IsJumpFalling = false;
+                
+                Jump();
+            }
+        }
+
+        private void JumpingCheck()
+        {
+            if (IsJumping && _controllerData.RigidbodyVelocity.y < 0)
+            {
+                IsJumping = false;
+                IsJumpFalling = true;
+            }
+        }
+
+        private void JumpStopCheck()
+        {
+            if (_lastOnGroundTime > 0 && !IsJumping)
+            {
+                IsJumpCut = false;
+                IsJumpFalling = false;
+            }
+        }
+        
+        private void Jump()
+        {
+            ResetJumpTimers();
+            
+            _jumpStartSubject.OnNext(_jumpingMethods.GetJumpForce(_controllerData.RigidbodyVelocity.y));
+        }
+
+        private void ResetJumpTimers()
+        {
+            _lastPressedJumpTime = 0;
+            _lastOnGroundTime = 0;
         }
     }
 }

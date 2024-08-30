@@ -23,13 +23,13 @@ namespace WhereIsMyWife.Controllers
     public interface IPlayerControllerData
     {
        public Vector2 RigidbodyVelocity { get; }
-       public Vector3 GroundCheckPosition { get; }
+       public Vector2 GroundCheckPosition { get; }
     }
     
     public partial class PlayerController : IPlayerControllerData
     {
         public Vector2 RigidbodyVelocity => _rigidbody2D.velocity;
-        public Vector3 GroundCheckPosition => _groundCheckTransform.position;
+        public Vector2 GroundCheckPosition => _groundCheckTransform.position;
     }
     
     public partial class PlayerController : MonoBehaviour
