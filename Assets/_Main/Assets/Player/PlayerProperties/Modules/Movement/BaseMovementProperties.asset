@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: BaseMovementProperties
   m_EditorClassIdentifier: 
   <RunMaxSpeed>k__BackingField: 10
-  <RunAccelerationRate>k__BackingField: 10
-  <RunDecelerationRate>k__BackingField: 10
+  <RunAccelerationRate>k__BackingField: 1
+  <RunDecelerationRate>k__BackingField: 1
   <AirAccelerationMultiplier>k__BackingField: 0.5
   <AirDecelerationMultiplier>k__BackingField: 0.75

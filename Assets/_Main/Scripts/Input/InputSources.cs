@@ -16,4 +16,12 @@ namespace WhereIsMyWife.Managers
         IObservable<Unit> LookUpAction { get; }
         IObservable<Unit> GoDownAction { get; }
     }
+    
+    public enum ControllerType
+    {
+        Keyboard,
+        Xbox,
+        Playstation,
+        Nintendo,
+    }
 }

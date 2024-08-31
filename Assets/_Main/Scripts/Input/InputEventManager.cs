@@ -27,11 +27,34 @@ namespace WhereIsMyWife.Managers
         public IObservable<Unit> LookUpAction => _lookUpSubject.AsObservable();
         public IObservable<Unit> GoDownAction => _goDownSubject.AsObservable();
     }
+
+    public partial class InputEventManager : IInitializable
+    {
+        public void Initialize()
+        {
+            CheckForCurrentController();
+        }
+    }
     
     public partial class InputEventManager : ITickable
     {
         public void Tick()
         {
+            if (Input.anyKeyDown)
+            {
+                if (InputWasFromJoystick())
+                {
+                    if (_currentControllerType == ControllerType.Keyboard)
+                    {
+                        CheckForCurrentController();
+                    }
+                }
+                else if (_currentControllerType != ControllerType.Keyboard)
+                {
+                    ChangeControllerType(ControllerType.Keyboard);
+                }                    
+            }
+            
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 _jumpStartSubject.OnNext();
@@ -74,10 +97,105 @@ namespace WhereIsMyWife.Managers
                 _goDownSubject.OnNext();
             }
         }
+        
+        private bool InputWasFromJoystick()
+        {
+            for (int i = 0; i < 20; i++)
+            {
+                if (Input.GetKeyDown((KeyCode)350 + i))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         private static Vector2 GetNormalizedRawAxesVector2()
         {
             return new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
+        }
+    }
+
+    public partial class InputEventManager
+    {
+        ControllerType _currentControllerType;
+        private string[] controllers;
+        
+        private void CheckForCurrentController()
+        {
+            controllers = Input.GetJoystickNames();
+            
+            for (int i = 0; i < controllers.Length; i++)
+            {
+                Debug.Log(controllers[i]);
+            }
+
+            if (OnlyKeyboardIsConnected())
+            {
+                ChangeControllerType(ControllerType.Keyboard);
+            }
+
+            else
+            {
+                ConnectController();
+            }
+        }
+
+        private void ChangeControllerType(ControllerType controllerType)
+        {
+            _currentControllerType = controllerType;
+            Debug.Log($"ControllerType: {_currentControllerType}");
+        }
+
+        private void ConnectController()
+        {
+            for (int index = 0; index < controllers.Length; index++)
+            {
+                if (!IsControllerValid(index))
+                {
+                    if (IsXboxConnected(index))
+                    {
+                        ChangeControllerType(ControllerType.Xbox);
+                        return;
+                    }
+                    else if (IsPlaystationConnected(index))
+                    {
+                        ChangeControllerType(ControllerType.Playstation);
+                        return;
+                    }
+                    else if (IsNintendoConnected(index))
+                    {
+                        ChangeControllerType(ControllerType.Nintendo);
+                        return;
+                    }
+                }
+            }
+        }
+
+        private bool IsControllerValid(int index)
+        {
+            return controllers[index] == "";
+        }
+
+        private bool IsNintendoConnected(int index)
+        {
+            return controllers[index].Contains("Pro") || controllers[index].Contains("Core") || controllers[index].Contains("Switch");
+        }
+
+        private bool IsPlaystationConnected(int index)
+        {
+            return controllers[index].Contains("playstation") || controllers[index].Contains("PS");
+        }
+
+        private bool IsXboxConnected(int index)
+        {
+            return controllers[index].Contains("Xbox");
+        }
+
+        private bool OnlyKeyboardIsConnected()
+        {
+            return controllers == null || controllers.Length == 0 || (controllers.Length == 1 && controllers[0] == "");
         }
     }
 }
