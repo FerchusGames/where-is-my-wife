@@ -1,6 +1,8 @@
 using System;
 using UniRx;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using WIMW.Input;
 using Zenject;
 
 namespace WhereIsMyWife.Managers
@@ -14,8 +16,6 @@ namespace WhereIsMyWife.Managers
         private readonly Subject<Vector2> _useItemSubject = new Subject<Vector2>();
         private readonly Subject<Unit> _hookStartSubject = new Subject<Unit>();
         private readonly Subject<Unit> _hookEndSubject = new Subject<Unit>();
-        private readonly Subject<Unit> _lookUpSubject = new Subject<Unit>();
-        private readonly Subject<Unit> _goDownSubject = new Subject<Unit>();
 
         public IObservable<Unit> JumpStartAction => _jumpStartSubject.AsObservable();
         public IObservable<Unit> JumpEndAction => _jumpEndSubject.AsObservable();
@@ -24,21 +24,75 @@ namespace WhereIsMyWife.Managers
         public IObservable<Vector2> UseItemAction => _useItemSubject.AsObservable();
         public IObservable<Unit> HookStartAction => _hookStartSubject.AsObservable();
         public IObservable<Unit> HookEndAction => _hookEndSubject.AsObservable();
-        public IObservable<Unit> LookUpAction => _lookUpSubject.AsObservable();
-        public IObservable<Unit> GoDownAction => _goDownSubject.AsObservable();
     }
 
     public partial class InputEventManager : IInitializable
     {
+        private PlayerInputActions _playerInputActions = new PlayerInputActions();
+        
+        private Vector2 _moveVector = Vector2.zero;
+        
         public void Initialize()
         {
+            _playerInputActions.Enable();
+            SubscribeToInputActions();
+            
             CheckForCurrentController();
+        }
+
+        private void SubscribeToInputActions()
+        {
+            _playerInputActions.Normal.Jump.performed += OnJumpPerform;
+            _playerInputActions.Normal.Jump.canceled += OnJumpCancel;
+            _playerInputActions.Normal.Move.performed += OnMovePerform;
+            _playerInputActions.Normal.Move.canceled += OnMoveCancel;
+            _playerInputActions.Normal.Dash.performed += OnDash;
+        }
+
+        private void OnJumpPerform(InputAction.CallbackContext context)
+        {
+            _jumpStartSubject.OnNext();
+        }
+
+        private void OnJumpCancel(InputAction.CallbackContext context)
+        {
+            _jumpEndSubject.OnNext();
+        }
+
+        private void OnMovePerform(InputAction.CallbackContext context)
+        {
+            _moveVector = context.ReadValue<Vector2>();
+        }
+
+        private void OnMoveCancel(InputAction.CallbackContext context)
+        {
+            _moveVector = Vector2.zero;
+        }
+
+        private void OnDash(InputAction.CallbackContext context)
+        {
+            _dashSubject.OnNext(_moveVector.normalized); 
+        }
+    }
+
+    public partial class InputEventManager : IDisposable
+    {
+        public void Dispose()
+        {
+            _playerInputActions.Disable();
         }
     }
     
     public partial class InputEventManager : ITickable
     {
         public void Tick()
+        {
+            CheckForControllerTypeChange();
+            
+            _runSubject.OnNext(_moveVector.x);
+        }
+
+        private void CheckForControllerTypeChange()
         {
             if (Input.anyKeyDown)
             {
@@ -54,50 +108,8 @@ namespace WhereIsMyWife.Managers
                     ChangeControllerType(ControllerType.Keyboard);
                 }                    
             }
-            
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                _jumpStartSubject.OnNext();
-            }
-
-            if (Input.GetKeyUp(KeyCode.Space))
-            {
-                _jumpEndSubject.OnNext();
-            }
-            
-            _runSubject.OnNext(Input.GetAxisRaw("Horizontal"));
-            
-            if (Input.GetKeyDown(KeyCode.LeftShift))
-            {
-                _dashSubject.OnNext(GetNormalizedRawAxesVector2()); 
-            }
-
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                _useItemSubject.OnNext(GetNormalizedRawAxesVector2());
-            }
-
-            if (Input.GetKeyDown(KeyCode.LeftControl))
-            {
-                _hookStartSubject.OnNext();
-            }
-
-            if (Input.GetKeyUp(KeyCode.LeftControl))
-            {
-                _hookEndSubject.OnNext();
-            }
-            
-            if (Input.GetKey(KeyCode.W))
-            {
-                _lookUpSubject.OnNext();
-            }
-
-            if (Input.GetKey(KeyCode.S))
-            {
-                _goDownSubject.OnNext();
-            }
         }
-        
+
         private bool InputWasFromJoystick()
         {
             for (int i = 0; i < 20; i++)
@@ -109,11 +121,6 @@ namespace WhereIsMyWife.Managers
             }
 
             return false;
-        }
-
-        private static Vector2 GetNormalizedRawAxesVector2()
-        {
-            return new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
         }
     }
 
@@ -152,22 +159,23 @@ namespace WhereIsMyWife.Managers
         {
             for (int index = 0; index < controllers.Length; index++)
             {
-                if (!IsControllerValid(index))
+                if (IsControllerValid(index))
                 {
                     if (IsXboxConnected(index))
                     {
                         ChangeControllerType(ControllerType.Xbox);
-                        return;
                     }
                     else if (IsPlaystationConnected(index))
                     {
                         ChangeControllerType(ControllerType.Playstation);
-                        return;
                     }
                     else if (IsNintendoConnected(index))
                     {
                         ChangeControllerType(ControllerType.Nintendo);
-                        return;
+                    }
+                    else
+                    {
+                        ChangeControllerType(ControllerType.Xbox);
                     }
                 }
             }
@@ -175,7 +183,7 @@ namespace WhereIsMyWife.Managers
 
         private bool IsControllerValid(int index)
         {
-            return controllers[index] == "";
+            return controllers[index] != "";
         }
 
         private bool IsNintendoConnected(int index)
