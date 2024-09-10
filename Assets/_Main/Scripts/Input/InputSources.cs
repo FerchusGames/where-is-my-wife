@@ -13,6 +13,8 @@ namespace WhereIsMyWife.Managers
         IObservable<Vector2> UseItemAction { get; }
         IObservable<Unit> HookStartAction { get; }
         IObservable<Unit> HookEndAction { get; }
+        IObservable<Unit> LookUpAction { get; }
+        IObservable<Unit> GoDownAction { get; }
     }
     
     public enum ControllerType

@@ -46,7 +46,7 @@ public class PlayerMovement : MonoBehaviour
         UpdateTimers(); // Implemented
         HandleInput(); // Implemented
         GroundCheck(); // Implemented
-        JumpChecks();
+        JumpChecks(); // Implemented
         GravityShifts();
         SetAnimatorParameters();
     }
@@ -76,43 +76,7 @@ public class PlayerMovement : MonoBehaviour
     }
 
     #endregion
-
-    #region JUMP CHECKS
-
-    private void JumpChecks()
-    {
-        JumpingCheck();
-        JumpCutCheck();
-
-        if (CanJump() && LastPressedJumpTime > 0)
-        {
-            IsJumping = true;
-            IsJumpCut = false;
-            IsJumpFalling = false;
-            Jump();
-        }
-    }
-
-    private void JumpingCheck()
-    {
-        if (IsJumping && PlayerRigidbody2D.velocity.y < 0)
-        {
-            IsJumping = false;
-
-            IsJumpFalling = true;
-        }
-    }
-
-    private void JumpCutCheck()
-    {
-        if (LastOnGroundTime > 0 && !IsJumping)
-        {
-            IsJumpCut = false;
-            IsJumpFalling = false; // Logic failure in the original script?
-        }
-    }
-
-    #endregion
+    
 
     #region GRAVITY
 
@@ -396,5 +360,41 @@ public class PlayerMovement : MonoBehaviour
 
         #endregion
         
+        #region JUMP CHECKS
+
+        private void JumpChecks()
+        {
+            JumpingCheck();
+            JumpCutCheck();
+
+            if (CanJump() && LastPressedJumpTime > 0)
+            {
+                IsJumping = true;
+                IsJumpCut = false;
+                IsJumpFalling = false;
+                Jump();
+            }
+        }
+
+        private void JumpingCheck()
+        {
+            if (IsJumping && PlayerRigidbody2D.velocity.y < 0)
+            {
+                IsJumping = false;
+
+                IsJumpFalling = true;
+            }
+        }
+
+        private void JumpCutCheck()
+        {
+            if (LastOnGroundTime > 0 && !IsJumping)
+            {
+                IsJumpCut = false;
+                IsJumpFalling = false; // Logic failure in the original script?
+            }
+        }
+
+        #endregion
     #endregion
 }

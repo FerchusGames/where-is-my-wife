@@ -13,6 +13,8 @@ namespace WhereIsMyWife.Controllers
         IObservable<float> Run { get; }
         IObservable<Vector2> DashStart { get; }
         IObservable<Unit> DashEnd { get; }
+        IObservable<float> GravityScale { get; }
+        IObservable<float> FallSpeedCap { get; }
     }
 
     public interface IPlayerControllerEvent
@@ -53,6 +55,8 @@ namespace WhereIsMyWife.Controllers
             _playerControllerInput.Run.Subscribe(Run).AddTo(this);
             _playerControllerInput.DashStart.Subscribe(DashStart).AddTo(this);
             _playerControllerInput.DashEnd.Subscribe(DashEnd).AddTo(this);
+            _playerControllerInput.GravityScale.Subscribe(SetGravityScale).AddTo(this);
+            _playerControllerInput.FallSpeedCap.Subscribe(SetFallSpeedCap).AddTo(this);
         }
 
         private void JumpStart(float jumpForce)
@@ -74,6 +78,17 @@ namespace WhereIsMyWife.Controllers
         private void DashEnd()
         {
             _rigidbody2D.velocity = Vector2.zero;
+        }
+
+        private void SetGravityScale(float gravityScale)
+        {
+            _rigidbody2D.gravityScale = gravityScale;
+        }
+
+        private void SetFallSpeedCap(float fallSpeedCap)
+        {
+            _rigidbody2D.velocity = new Vector2(_rigidbody2D.velocity.x,
+                Mathf.Max(_rigidbody2D.velocity.y, -fallSpeedCap));
         }
     }
 }

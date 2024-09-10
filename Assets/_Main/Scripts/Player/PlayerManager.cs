@@ -32,6 +32,7 @@ namespace WhereIsMyWife.Managers
         // Movement
         private float _accelerationRate = 0;
         private float _targetSpeed = 0;
+        private bool _isGoingDown = false;
         
         // Timers
         private float _lastOnGroundTime = 0;
@@ -82,12 +83,16 @@ namespace WhereIsMyWife.Managers
         private Subject<float> _runSubject = new Subject<float>();
         private Subject<Vector2> _dashStartSubject = new Subject<Vector2>();
         private Subject<Unit> _dashEndSubject = new Subject<Unit>();
+        private Subject<float> _gravityScaleSubject = new Subject<float>();
+        private Subject<float> _fallSpeedCapSubject = new Subject<float>();
 
         public IObservable<float> JumpStart => _jumpStartSubject.AsObservable();
         public IObservable<Unit> JumpEnd => _jumpEndSubject.AsObservable();
         public IObservable<float> Run => _runSubject.AsObservable();
         public IObservable<Vector2> DashStart => _dashStartSubject.AsObservable();
         public IObservable<Unit> DashEnd => _dashEndSubject.AsObservable();
+        public IObservable<float> GravityScale => _gravityScaleSubject.AsObservable();
+        public IObservable<float> FallSpeedCap => _fallSpeedCapSubject.AsObservable();
         
         private void ExecuteJumpStartEvent()
         {
@@ -110,6 +115,11 @@ namespace WhereIsMyWife.Managers
         private void ExecuteDashStartEvent(Vector2 dashDirection)
         {
             Dash(dashDirection).Forget();
+        }
+
+        private void ExecuteGoDownEvent()
+        {
+            _isGoingDown = true;
         }
         
         private async UniTaskVoid Dash(Vector2 dashDirection)
@@ -137,6 +147,8 @@ namespace WhereIsMyWife.Managers
         public void Initialize()
         {
             SubscribeToObservables();
+
+            _gravityScaleSubject.OnNext(_properties.Gravity.Scale);
         }
 
         private void SubscribeToObservables()
@@ -145,6 +157,7 @@ namespace WhereIsMyWife.Managers
             _playerInputEvent.JumpEndAction.Subscribe(ExecuteJumpEndEvent);
             _playerInputEvent.RunAction.Subscribe(ExecuteRunEvent);
             _playerInputEvent.DashAction.Subscribe(ExecuteDashStartEvent);
+            _playerInputEvent.GoDownAction.Subscribe(ExecuteGoDownEvent);
         }
     }
 
@@ -155,8 +168,9 @@ namespace WhereIsMyWife.Managers
             TickTimers();
             GroundCheck();
             JumpChecks();
+            GravityShifts();
         }
-
+        
         private void TickTimers()
         {
             _lastOnGroundTime -= Time.deltaTime;
@@ -221,6 +235,54 @@ namespace WhereIsMyWife.Managers
         {
             _lastPressedJumpTime = 0;
             _lastOnGroundTime = 0;
+        }
+        
+        private void GravityShifts()
+        {
+            // Make player fall faster if holding down 
+            if (_controllerData.RigidbodyVelocity.y < 0 && _isGoingDown)
+            {
+                SetGravityScale(_properties.Gravity.Scale * _properties.Gravity.FastFallMultiplier);
+                SetFallSpeedCap(_properties.Gravity.MaxFastFallSpeed);
+            }
+            
+            // Scale gravity up if jump button released
+            else if (IsJumpCut)
+            {
+                SetGravityScale(_properties.Gravity.Scale  * _properties.Gravity.JumpCutMultiplier);
+                SetFallSpeedCap(_properties.Gravity.MaxBaseFallSpeed);
+            }
+
+            // Higher gravity when near jump height apex
+            else if (IsInJumpHang())
+            {
+                SetGravityScale(_properties.Gravity.Scale  * _properties.Gravity.JumpHangMultiplier);
+            }
+
+            // Higher gravity if falling
+            else if (_controllerData.RigidbodyVelocity.y < 0)
+            {
+                SetGravityScale(_properties.Gravity.Scale  * _properties.Gravity.BaseFallMultiplier);
+                SetFallSpeedCap(_properties.Gravity.MaxBaseFallSpeed);
+            }
+
+            // Reset gravity
+            else
+            {
+                SetGravityScale(_properties.Gravity.Scale);
+            }
+
+            _isGoingDown = false;
+        }
+
+        private void SetFallSpeedCap(float fallSpeedCap)
+        {
+            _fallSpeedCapSubject.OnNext(fallSpeedCap);
+        }
+
+        private void SetGravityScale(float gravityScale)
+        {
+            _gravityScaleSubject.OnNext(gravityScale);
         }
     }
 }

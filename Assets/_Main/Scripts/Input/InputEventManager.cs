@@ -16,6 +16,8 @@ namespace WhereIsMyWife.Managers
         private readonly Subject<Vector2> _useItemSubject = new Subject<Vector2>();
         private readonly Subject<Unit> _hookStartSubject = new Subject<Unit>();
         private readonly Subject<Unit> _hookEndSubject = new Subject<Unit>();
+        private readonly Subject<Unit> _lookUpSubject = new Subject<Unit>();
+        private readonly Subject<Unit> _goDownSubject = new Subject<Unit>();
 
         public IObservable<Unit> JumpStartAction => _jumpStartSubject.AsObservable();
         public IObservable<Unit> JumpEndAction => _jumpEndSubject.AsObservable();
@@ -24,6 +26,8 @@ namespace WhereIsMyWife.Managers
         public IObservable<Vector2> UseItemAction => _useItemSubject.AsObservable();
         public IObservable<Unit> HookStartAction => _hookStartSubject.AsObservable();
         public IObservable<Unit> HookEndAction => _hookEndSubject.AsObservable();
+        public IObservable<Unit> LookUpAction => _lookUpSubject.AsObservable();
+        public IObservable<Unit> GoDownAction => _goDownSubject.AsObservable();
     }
 
     public partial class InputEventManager : IInitializable
@@ -62,6 +66,11 @@ namespace WhereIsMyWife.Managers
         private void OnMovePerform(InputAction.CallbackContext context)
         {
             _moveVector = context.ReadValue<Vector2>();
+
+            if (_moveVector.y < 0)
+            {
+                _goDownSubject.OnNext();
+            }
         }
 
         private void OnMoveCancel(InputAction.CallbackContext context)
@@ -92,6 +101,7 @@ namespace WhereIsMyWife.Managers
             _runSubject.OnNext(_moveVector.x);
         }
 
+        // TODO: Change the way it detects the input was from a different controller type
         private void CheckForControllerTypeChange()
         {
             if (Input.anyKeyDown)
@@ -110,6 +120,7 @@ namespace WhereIsMyWife.Managers
             }
         }
 
+        // TODO: Change the way it detects the input was from a gamepad
         private bool InputWasFromJoystick()
         {
             for (int i = 0; i < 20; i++)
@@ -119,7 +130,7 @@ namespace WhereIsMyWife.Managers
                     return true;
                 }
             }
-
+            
             return false;
         }
     }
