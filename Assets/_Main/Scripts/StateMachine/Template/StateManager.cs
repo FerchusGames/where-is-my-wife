@@ -1,19 +1,21 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 using Zenject;
 
-public abstract class StateManager<EState> : IInitializable, ITickable where EState : Enum
+public abstract class StateManager<EState> : MonoBehaviour where EState : Enum
 {
     protected Dictionary<EState, BaseState<EState>> States = new Dictionary<EState, BaseState<EState>>();
     protected BaseState<EState> CurrentState;
+    
     protected bool IsTransitioningState = false;
     
-    public void Initialize()
+    private void Start()
     {
         CurrentState.EnterState();
     }
 
-    public void Tick()
+    private void Update()
     {
         EState nextStateKey = CurrentState.GetNextState();
 
@@ -35,5 +37,20 @@ public abstract class StateManager<EState> : IInitializable, ITickable where ESt
         CurrentState = States[nextStateKey];
         CurrentState.EnterState();
         IsTransitioningState = false;
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        CurrentState.OnTriggerEnter2D(other);
+    }
+
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        CurrentState.OnTriggerStay2D(other);
+    }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        CurrentState.OnTriggerExit2D(other);
     }
 }
