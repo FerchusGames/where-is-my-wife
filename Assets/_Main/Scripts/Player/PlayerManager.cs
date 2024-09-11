@@ -16,6 +16,8 @@ namespace WhereIsMyWife.Managers
         public bool IsJumpCut { get; }
         public bool IsJumpFalling { get; }
         public bool IsOnJumpInputBuffer();
+        public bool IsFastFalling();
+
         public bool IsOnGround();
         public bool IsInJumpHang();
         public bool CanJump();
@@ -55,6 +57,11 @@ namespace WhereIsMyWife.Managers
         public bool IsOnGround()
         {
             return _lastOnGroundTime >= 0;
+        }
+
+        public bool IsFastFalling()
+        {
+            return _controllerData.RigidbodyVelocity.y < 0 && _isGoingDown;
         }
         
         public bool IsInJumpHang()
@@ -240,7 +247,7 @@ namespace WhereIsMyWife.Managers
         private void GravityShifts()
         {
             // Make player fall faster if holding down 
-            if (_controllerData.RigidbodyVelocity.y < 0 && _isGoingDown)
+            if (IsFastFalling())
             {
                 SetGravityScale(_properties.Gravity.Scale * _properties.Gravity.FastFallMultiplier);
                 SetFallSpeedCap(_properties.Gravity.MaxFastFallSpeed);
@@ -260,7 +267,7 @@ namespace WhereIsMyWife.Managers
             }
 
             // Higher gravity if falling
-            else if (_controllerData.RigidbodyVelocity.y < 0)
+            else if (IsJumpFalling)
             {
                 SetGravityScale(_properties.Gravity.Scale  * _properties.Gravity.BaseFallMultiplier);
                 SetFallSpeedCap(_properties.Gravity.MaxBaseFallSpeed);

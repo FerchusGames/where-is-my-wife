@@ -71,8 +71,7 @@ namespace WhereIsMyWife.Controllers
 
         private void DashStart(Vector2 dashForce)
         {
-            _rigidbody2D.velocity = Vector2.zero;
-            _rigidbody2D.AddForce(dashForce, ForceMode2D.Impulse);
+            _rigidbody2D.velocity = dashForce;
         }
 
         private void DashEnd()

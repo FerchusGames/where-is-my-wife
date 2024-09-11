@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bae492cc289e26747ad85243aec0e123, type: 3}
   m_Name: BaseDashProperties
   m_EditorClassIdentifier: 
-  <Speed>k__BackingField: 0
-  <Duration>k__BackingField: 0
+  <Speed>k__BackingField: 20
+  <Duration>k__BackingField: 1
   <HangTime>k__BackingField: 0
   <Cooldown>k__BackingField: 0
