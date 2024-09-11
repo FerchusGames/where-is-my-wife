@@ -49,7 +49,6 @@ namespace WhereIsMyWife
             Container.BindInterfacesTo<PlayerDashProperties>().FromScriptableObject(_playerProperties.DashProperties).AsSingle();
             Container.BindInterfacesTo<PlayerMovementProperties>().FromScriptableObject(_playerProperties.MovementProperties).AsSingle();
             Container.BindInterfacesTo<PlayerGravityProperties>().FromScriptableObject(_playerProperties.GravityProperties).AsSingle();
-            Container.BindInterfacesTo<PlayerCombatProperties>().FromScriptableObject(_playerProperties.CombatProperties).AsSingle();
             Container.BindInterfacesTo<PlayerCheckProperties>().FromScriptableObject(_playerProperties.CheckProperties).AsSingle();
         }
 
