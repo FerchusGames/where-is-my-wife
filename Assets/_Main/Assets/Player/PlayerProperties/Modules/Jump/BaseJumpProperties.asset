@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1cbc933fc70d95548a4ef81756bbab25, type: 3}
   m_Name: BaseJumpProperties
   m_EditorClassIdentifier: 
-  <ForceMagnitude>k__BackingField: 16.3
+  <ForceMagnitude>k__BackingField: 18
   <CoyoteTime>k__BackingField: 0.2
   <InputBufferTime>k__BackingField: 0.2
   <HangTimeThreshold>k__BackingField: 3

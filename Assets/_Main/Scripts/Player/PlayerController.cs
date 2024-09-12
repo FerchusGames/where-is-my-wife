@@ -41,6 +41,8 @@ namespace WhereIsMyWife.Controllers
 
         [SerializeField] private Rigidbody2D _rigidbody2D;
         [SerializeField] private Transform _groundCheckTransform = null;
+
+        private float _runAcceleration;
         
         private void Start()
         {
@@ -49,10 +51,18 @@ namespace WhereIsMyWife.Controllers
             SubscribeToObservables();
         }
 
+        private void FixedUpdate()
+        {
+            Run();
+        }
+
         private void SubscribeToObservables()
         {
             _playerControllerInput.JumpStart.Subscribe(JumpStart).AddTo(this);
-            _playerControllerInput.Run.Subscribe(Run).AddTo(this);
+            
+            // TODO: Subscribe to Run() instead after being called every FixedUpdate
+            _playerControllerInput.Run.Subscribe(SetRunAccelerationRate).AddTo(this); 
+                
             _playerControllerInput.DashStart.Subscribe(DashStart).AddTo(this);
             _playerControllerInput.DashEnd.Subscribe(DashEnd).AddTo(this);
             _playerControllerInput.GravityScale.Subscribe(SetGravityScale).AddTo(this);
@@ -64,9 +74,15 @@ namespace WhereIsMyWife.Controllers
             _rigidbody2D.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
         }
 
-        private void Run(float runAcceleration)
+        private void SetRunAccelerationRate(float runAcceleration)
         {
-            _rigidbody2D.AddForce(Vector2.right * runAcceleration, ForceMode2D.Force);
+            _runAcceleration = runAcceleration;
+        }
+
+        private void Run()
+        {
+            Debug.Log($"Run Accceleration: {_runAcceleration}");
+            _rigidbody2D.AddForce(Vector2.right * _runAcceleration, ForceMode2D.Force);
         }
 
         private void DashStart(Vector2 dashForce)
