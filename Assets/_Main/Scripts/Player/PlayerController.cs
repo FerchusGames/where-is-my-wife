@@ -21,6 +21,13 @@ namespace WhereIsMyWife.Controllers
     {
         void SetPlayerControllerData(IPlayerControllerData playerControllerData);
     }
+    
+    public interface IRespawn
+    {
+        public void SetRespawnPoint(Vector3 respawnPoint);
+        public void TriggerRespawn();
+        public IObservable<Vector3> RespawnAction { get; }
+    }
 
     public interface IPlayerControllerData
     {
@@ -38,6 +45,7 @@ namespace WhereIsMyWife.Controllers
     {
         [Inject] private IPlayerControllerInput _playerControllerInput;
         [Inject] private IPlayerControllerEvent _playerControllerEvent;
+        [Inject] private IRespawn _respawn;
 
         [SerializeField] private Rigidbody2D _rigidbody2D;
         [SerializeField] private Transform _groundCheckTransform = null;
@@ -67,6 +75,8 @@ namespace WhereIsMyWife.Controllers
             _playerControllerInput.DashEnd.Subscribe(DashEnd).AddTo(this);
             _playerControllerInput.GravityScale.Subscribe(SetGravityScale).AddTo(this);
             _playerControllerInput.FallSpeedCap.Subscribe(SetFallSpeedCap).AddTo(this);
+            
+            _respawn.RespawnAction.Subscribe(Respawn).AddTo(this);
         }
 
         private void JumpStart(float jumpForce)
@@ -104,6 +114,11 @@ namespace WhereIsMyWife.Controllers
         {
             _rigidbody2D.velocity = new Vector2(_rigidbody2D.velocity.x,
                 Mathf.Max(_rigidbody2D.velocity.y, -fallSpeedCap));
+        }
+
+        private void Respawn(Vector3 respawnPosition)
+        {
+            transform.position = respawnPosition;
         }
     }
 }

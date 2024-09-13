@@ -292,28 +292,24 @@ namespace WhereIsMyWife.Managers
             _gravityScaleSubject.OnNext(gravityScale);
         }
     }
-
-    public interface IRespawn
-    {
-        public void SetRespawnPoint(Vector3 respawnPoint);
-        public void Respawn();
-        public IObservable<Vector3> RespawnAction { get; }
-    }
+    
     
     public partial class PlayerManager : IRespawn
     {
         private Vector3 _respawnPoint;
+     
+        private ISubject<Vector3> _respawnSubject = new Subject<Vector3>();
+        
+        public IObservable<Vector3> RespawnAction => _respawnSubject.AsObservable();
         
         public void SetRespawnPoint(Vector3 respawnPoint)
         {
             _respawnPoint = respawnPoint;
         }
 
-        public void Respawn()
+        public void TriggerRespawn()
         {
-           
+           _respawnSubject.OnNext(_respawnPoint);
         }
-
-        public IObservable<Vector3> RespawnAction { get; }
     }
 }
