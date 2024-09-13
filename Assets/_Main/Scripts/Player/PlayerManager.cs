@@ -43,11 +43,11 @@ namespace WhereIsMyWife.Managers
 
     public partial class PlayerManager : IPlayerStateIndicator
     {
-        public bool IsDead { get; private set; } 
-        public bool IsFacingRight { get; private set; } 
-        public bool IsJumping { get; private set; } 
-        public bool IsJumpCut { get; private set; }
-        public bool IsJumpFalling { get; private set; }
+        public bool IsDead { get; private set; } = false;
+        public bool IsFacingRight { get; private set; } = true;
+        public bool IsJumping { get; private set; } = false;
+        public bool IsJumpCut { get; private set; } = false;
+        public bool IsJumpFalling { get; private set; } = false;
 
         public bool IsOnJumpInputBuffer()
         {
@@ -92,6 +92,7 @@ namespace WhereIsMyWife.Managers
         private Subject<Unit> _dashEndSubject = new Subject<Unit>();
         private Subject<float> _gravityScaleSubject = new Subject<float>();
         private Subject<float> _fallSpeedCapSubject = new Subject<float>();
+        private Subject<Unit> _turnSubject = new Subject<Unit>();
 
         public IObservable<float> JumpStart => _jumpStartSubject.AsObservable();
         public IObservable<Unit> JumpEnd => _jumpEndSubject.AsObservable();
@@ -100,6 +101,7 @@ namespace WhereIsMyWife.Managers
         public IObservable<Unit> DashEnd => _dashEndSubject.AsObservable();
         public IObservable<float> GravityScale => _gravityScaleSubject.AsObservable();
         public IObservable<float> FallSpeedCap => _fallSpeedCapSubject.AsObservable();
+        public IObservable<Unit> Turn => _turnSubject.AsObservable();
         
         private void ExecuteJumpStartEvent()
         {
@@ -116,7 +118,22 @@ namespace WhereIsMyWife.Managers
         
         private void ExecuteRunEvent(float runDirection)
         {
+            if (runDirection != 0)
+            {
+                bool isMovingRight = runDirection > 0;
+                CheckDirectionToFace(isMovingRight);
+            }
+            
             _runSubject.OnNext(_runningMethods.GetRunAcceleration(runDirection, _controllerData.RigidbodyVelocity.x));
+        }
+
+        private void CheckDirectionToFace(bool isMovingRight)
+        {
+            if (isMovingRight != IsFacingRight)
+            {
+                _turnSubject.OnNext();
+                IsFacingRight = !IsFacingRight;
+            }
         }
 
         private void ExecuteDashStartEvent(Vector2 dashDirection)

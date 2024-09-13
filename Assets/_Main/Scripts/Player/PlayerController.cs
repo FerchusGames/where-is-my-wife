@@ -13,6 +13,7 @@ namespace WhereIsMyWife.Controllers
         IObservable<float> Run { get; }
         IObservable<Vector2> DashStart { get; }
         IObservable<Unit> DashEnd { get; }
+        IObservable<Unit> Turn { get; }
         IObservable<float> GravityScale { get; }
         IObservable<float> FallSpeedCap { get; }
     }
@@ -75,6 +76,7 @@ namespace WhereIsMyWife.Controllers
             _playerControllerInput.DashEnd.Subscribe(DashEnd).AddTo(this);
             _playerControllerInput.GravityScale.Subscribe(SetGravityScale).AddTo(this);
             _playerControllerInput.FallSpeedCap.Subscribe(SetFallSpeedCap).AddTo(this);
+            _playerControllerInput.Turn.Subscribe(Turn).AddTo(this);
             
             _respawn.RespawnAction.Subscribe(Respawn).AddTo(this);
         }
@@ -93,6 +95,13 @@ namespace WhereIsMyWife.Controllers
         {
             Debug.Log($"Run Accceleration: {_runAcceleration}");
             _rigidbody2D.AddForce(Vector2.right * _runAcceleration, ForceMode2D.Force);
+        }
+
+        private void Turn()
+        {
+            Vector3 scale = transform.localScale;
+            scale.x *= -1;
+            transform.localScale = scale;
         }
 
         private void DashStart(Vector2 dashForce)
