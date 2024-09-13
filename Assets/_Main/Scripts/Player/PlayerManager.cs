@@ -17,9 +17,9 @@ namespace WhereIsMyWife.Managers
         public bool IsJumpFalling { get; }
         public bool IsOnJumpInputBuffer();
         public bool IsFastFalling();
-
         public bool IsOnGround();
         public bool IsInJumpHang();
+        public bool IsIdling();
         public bool CanJump();
         public bool CanJumpCut();
     }
@@ -41,6 +41,34 @@ namespace WhereIsMyWife.Managers
         private float _lastPressedJumpTime = 0;
     }
 
+    public partial class PlayerManager : IAnimationControllerInput
+    {
+        private const string DASH_ANIMATION_STATE = "dash";
+        private const string WALK_ANIMATION_STATE = "walk";
+        private const string IDLE_ANIMATION_STATE = "idle";
+        private const string FALL_ANIMATION_STATE = "fall";
+        private const string JUMP_ANIMATION_STATE = "jump";
+        private const string CROUCH_ANIMATION_STATE = "crouch";
+        private const string WALL_SLIDE_ANIMATION_STATE = "wall_slide";
+        private const string LAND_ANIMATION_STATE = "land";
+        private const string WALL_HIT_ANIMATION_STATE = "wall_hit";
+
+        private string _currentAnimationState = "";
+
+        private ISubject<string> _playAnimationSubject = new Subject<string>();
+
+        public IObservable<string> PlayAnimationStateAction => _playAnimationSubject.AsObservable();
+
+        private void PlayAnimationState(string newState)
+        {
+            if (_currentAnimationState == newState) return;
+            
+            _playAnimationSubject.OnNext(newState);
+
+            _currentAnimationState = newState;
+        }
+    }
+    
     public partial class PlayerManager : IPlayerStateIndicator
     {
         public bool IsDead { get; private set; } = false;
@@ -68,6 +96,12 @@ namespace WhereIsMyWife.Managers
         {
             return (IsJumping || IsJumpFalling) 
                    && Mathf.Abs(_controllerData.RigidbodyVelocity.y) < _properties.Jump.HangTimeThreshold;
+        }
+
+        public bool IsIdling()
+        {
+            return (Mathf.Abs(_controllerData.RigidbodyVelocity.x) < 0.1f 
+                    && Mathf.Abs(_controllerData.RigidbodyVelocity.y) < 0.1f);
         }
 
         public bool CanJump()
@@ -122,6 +156,7 @@ namespace WhereIsMyWife.Managers
             {
                 bool isMovingRight = runDirection > 0;
                 CheckDirectionToFace(isMovingRight);
+                PlayAnimationState(WALK_ANIMATION_STATE);   
             }
             
             _runSubject.OnNext(_runningMethods.GetRunAcceleration(runDirection, _controllerData.RigidbodyVelocity.x));
@@ -193,8 +228,17 @@ namespace WhereIsMyWife.Managers
             GroundCheck();
             JumpChecks();
             GravityShifts();
+            Idle();
         }
-        
+
+        private void Idle()
+        {
+            if (IsIdling())
+            {
+                PlayAnimationState(IDLE_ANIMATION_STATE);
+            }
+        }
+
         private void TickTimers()
         {
             _lastOnGroundTime -= Time.deltaTime;
@@ -253,6 +297,7 @@ namespace WhereIsMyWife.Managers
             ResetJumpTimers();
             
             _jumpStartSubject.OnNext(_jumpingMethods.GetJumpForce(_controllerData.RigidbodyVelocity.y));
+            PlayAnimationState(JUMP_ANIMATION_STATE);
         }
 
         private void ResetJumpTimers()
