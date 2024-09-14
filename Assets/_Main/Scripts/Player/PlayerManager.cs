@@ -76,7 +76,7 @@ namespace WhereIsMyWife.Managers
         public bool IsJumping { get; private set; } = false;
         public bool IsJumpCut { get; private set; } = false;
         public bool IsJumpFalling { get; private set; } = false;
-
+        
         public bool IsOnJumpInputBuffer()
         {
             return _lastPressedJumpTime >= 0;
