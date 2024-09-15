@@ -2,6 +2,7 @@ using UnityEngine;
 using WhereIsMyWife.Databases;
 using WhereIsMyWife.Managers;
 using WhereIsMyWife.Managers.Properties;
+using WhereIsMyWife.Player.State;
 using Zenject;
 
 namespace WhereIsMyWife
@@ -16,6 +17,7 @@ namespace WhereIsMyWife
             InstallDatabaseBindings();
             InstallManagerBindings();
             InstallActionMethods();
+            InstallPlayerStates();
         }
 
         private void InstallManagerBindings()
@@ -56,6 +58,11 @@ namespace WhereIsMyWife
         {
             Container.BindInterfacesTo<RunningMethods>().AsSingle();
             Container.BindInterfacesTo<JumpingMethods>().AsSingle();
+        }
+
+        private void InstallPlayerStates()
+        {
+            Container.BindInterfacesTo<PlayerMovementState>().AsSingle();
         }
     }
 }

@@ -2,15 +2,13 @@
 using UniRx;
 using UnityEngine;
 
-namespace WhereIsMyWife.Controllers
+namespace WhereIsMyWife.Player.State
 {
-    public interface IPlayerControllerInput
+    public interface IPlayerStateInput
     {
         IObservable<float> JumpStart { get; }
-        IObservable<Unit> JumpEnd { get; }
         IObservable<float> Run { get; }
         IObservable<Vector2> DashStart { get; }
-        IObservable<Unit> DashEnd { get; }
         IObservable<Unit> Turn { get; }
         IObservable<float> GravityScale { get; }
         IObservable<float> FallSpeedCap { get; }

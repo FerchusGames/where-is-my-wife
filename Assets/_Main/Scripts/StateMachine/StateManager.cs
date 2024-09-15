@@ -9,7 +9,7 @@ public abstract class StateManager<EState> : MonoBehaviour where EState : Enum
     protected BaseState<EState> CurrentState;
     
     protected bool IsTransitioningState = false;
-    
+
     private void Start()
     {
         CurrentState.EnterState();
@@ -17,7 +17,7 @@ public abstract class StateManager<EState> : MonoBehaviour where EState : Enum
 
     private void Update()
     {
-        EState nextStateKey = CurrentState.GetNextState();
+        EState nextStateKey = CurrentState.NextState;
 
         if (!IsTransitioningState && nextStateKey.Equals(CurrentState.StateKey))
         {
@@ -28,6 +28,11 @@ public abstract class StateManager<EState> : MonoBehaviour where EState : Enum
         {
             TransitionToState(nextStateKey);
         }
+    }
+
+    private void FixedUpdate()
+    {
+        CurrentState.FixedUpdateState();
     }
 
     private void TransitionToState(EState nextStateKey)

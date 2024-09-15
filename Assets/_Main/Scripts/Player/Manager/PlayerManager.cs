@@ -1,9 +1,9 @@
 using System;
-using Cysharp.Threading.Tasks;
 using UniRx;
 using UnityEngine;
 using WhereIsMyWife.Controllers;
 using WhereIsMyWife.Managers.Properties;
+using WhereIsMyWife.Player.State;
 using Zenject;
 
 namespace WhereIsMyWife.Managers
@@ -99,7 +99,7 @@ namespace WhereIsMyWife.Managers
         }
     }
     
-    public partial class PlayerManager : IPlayerControllerInput
+    public partial class PlayerManager : IPlayerStateInput
     {
         [Inject] private IPlayerInputEvent _playerInputEvent;
 
@@ -107,7 +107,6 @@ namespace WhereIsMyWife.Managers
         private Subject<Unit> _jumpEndSubject = new Subject<Unit>();
         private Subject<float> _runSubject = new Subject<float>();
         private Subject<Vector2> _dashStartSubject = new Subject<Vector2>();
-        private Subject<Unit> _dashEndSubject = new Subject<Unit>();
         private Subject<float> _gravityScaleSubject = new Subject<float>();
         private Subject<float> _fallSpeedCapSubject = new Subject<float>();
         private Subject<Unit> _turnSubject = new Subject<Unit>();
@@ -116,7 +115,6 @@ namespace WhereIsMyWife.Managers
         public IObservable<Unit> JumpEnd => _jumpEndSubject.AsObservable();
         public IObservable<float> Run => _runSubject.AsObservable();
         public IObservable<Vector2> DashStart => _dashStartSubject.AsObservable();
-        public IObservable<Unit> DashEnd => _dashEndSubject.AsObservable();
         public IObservable<float> GravityScale => _gravityScaleSubject.AsObservable();
         public IObservable<float> FallSpeedCap => _fallSpeedCapSubject.AsObservable();
         public IObservable<Unit> Turn => _turnSubject.AsObservable();
@@ -157,21 +155,12 @@ namespace WhereIsMyWife.Managers
 
         private void ExecuteDashStartEvent(Vector2 dashDirection)
         {
-            Dash(dashDirection).Forget();
+            _dashStartSubject.OnNext(dashDirection * _properties.Dash.Speed);
         }
 
         private void ExecuteGoDownEvent()
         {
             _isGoingDown = true;
-        }
-        
-        private async UniTaskVoid Dash(Vector2 dashDirection)
-        {
-            _dashStartSubject.OnNext(dashDirection * _properties.Dash.Speed);
-
-            await UniTask.Delay(TimeSpan.FromSeconds(_properties.Dash.Duration), ignoreTimeScale: false);
-            
-            _dashEndSubject.OnNext();
         }
     }
 
@@ -338,7 +327,6 @@ namespace WhereIsMyWife.Managers
             _gravityScaleSubject.OnNext(gravityScale);
         }
     }
-    
     
     public partial class PlayerManager : IRespawn
     {
