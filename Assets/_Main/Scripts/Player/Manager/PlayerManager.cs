@@ -24,34 +24,6 @@ namespace WhereIsMyWife.Managers
         private float _lastOnGroundTime = 0;
         private float _lastPressedJumpTime = 0;
     }
-
-    public partial class PlayerManager : IAnimationControllerInput
-    {
-        private const string DASH_ANIMATION_STATE = "dash";
-        private const string WALK_ANIMATION_STATE = "walk";
-        private const string IDLE_ANIMATION_STATE = "idle";
-        private const string FALL_ANIMATION_STATE = "fall";
-        private const string JUMP_ANIMATION_STATE = "jump";
-        private const string CROUCH_ANIMATION_STATE = "crouch";
-        private const string WALL_SLIDE_ANIMATION_STATE = "wall_slide";
-        private const string LAND_ANIMATION_STATE = "land";
-        private const string WALL_HIT_ANIMATION_STATE = "wall_hit";
-
-        private string _currentAnimationState = "";
-
-        private ISubject<string> _playAnimationSubject = new Subject<string>();
-
-        public IObservable<string> PlayAnimationStateAction => _playAnimationSubject.AsObservable();
-
-        private void PlayAnimationState(string newState)
-        {
-            if (_currentAnimationState == newState) return;
-            
-            _playAnimationSubject.OnNext(newState);
-
-            _currentAnimationState = newState;
-        }
-    }
     
     public partial class PlayerManager : IPlayerStateIndicator
     {
@@ -60,7 +32,8 @@ namespace WhereIsMyWife.Managers
         public bool IsJumping { get; private set; } = false;
         public bool IsJumpCut { get; private set; } = false;
         public bool IsJumpFalling { get; private set; } = false;
-        
+        public bool IsRunFalling { get; private set; } = false;
+
         public bool IsOnJumpInputBuffer()
         {
             return _lastPressedJumpTime >= 0;
@@ -135,7 +108,6 @@ namespace WhereIsMyWife.Managers
             if (runDirection != 0)
             {
                 bool isMovingRight = runDirection > 0;
-                PlayAnimationState(WALK_ANIMATION_STATE);   
             }
             
             _runSubject.OnNext(_runningMethods.GetRunAcceleration(runDirection, _controllerData.RigidbodyVelocity.x));
@@ -190,7 +162,6 @@ namespace WhereIsMyWife.Managers
             JumpChecks();
             CheckRunningDirection();
             GravityShifts();
-            Idle();
         }
 
         private void CheckRunningDirection()
@@ -209,15 +180,6 @@ namespace WhereIsMyWife.Managers
                 IsRunningRight = false;
             }
         }
-
-        private void Idle()
-        {
-            if (IsIdling())
-            {
-                PlayAnimationState(IDLE_ANIMATION_STATE);
-            }
-        }
-
         private void TickTimers()
         {
             _lastOnGroundTime -= Time.deltaTime;
@@ -229,6 +191,12 @@ namespace WhereIsMyWife.Managers
             if (GetGroundCheckOverlapBox() && !IsJumping)
             {
                 _lastOnGroundTime = _properties.Jump.CoyoteTime;
+                IsRunFalling = false;
+            }
+
+            if (!IsJumping && _lastOnGroundTime < _properties.Jump.CoyoteTime)
+            {
+                IsRunFalling = true;
             }
         }
 
@@ -248,6 +216,7 @@ namespace WhereIsMyWife.Managers
                 IsJumping = true;
                 IsJumpCut = false;
                 IsJumpFalling = false;
+                IsRunFalling = false;
                 
                 Jump();
             }
@@ -276,7 +245,6 @@ namespace WhereIsMyWife.Managers
             ResetJumpTimers();
             
             _jumpStartSubject.OnNext(_jumpingMethods.GetJumpForce(_controllerData.RigidbodyVelocity.y));
-            PlayAnimationState(JUMP_ANIMATION_STATE);
         }
 
         private void ResetJumpTimers()

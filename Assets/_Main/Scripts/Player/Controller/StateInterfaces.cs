@@ -8,7 +8,6 @@ namespace WhereIsMyWife.Controllers
     {
         IObservable<float> JumpStart { get; }
         IObservable<float> Run { get; }
-        IObservable<Unit> Turn { get; }
         IObservable<float> GravityScale { get; }
         IObservable<float> FallSpeedCap { get; }
     }

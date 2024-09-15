@@ -12,19 +12,16 @@ namespace WhereIsMyWife.Player.State
         
         private ISubject<float> _jumpStartSubject = new Subject<float>();
         private ISubject<float> _runSubject = new Subject<float>();
-        private ISubject<Unit> _turnSubject = new Subject<Unit>();
         private ISubject<float> _gravityScaleSubject = new Subject<float>();
         private ISubject<float> _fallSpeedCapSubject = new Subject<float>();
 
         public IObservable<float> JumpStart => _jumpStartSubject.AsObservable();
         public IObservable<float> Run => _runSubject.AsObservable();
-        public IObservable<Unit> Turn => _turnSubject.AsObservable();
         public IObservable<float> GravityScale => _gravityScaleSubject.AsObservable();
         public IObservable<float> FallSpeedCap => _fallSpeedCapSubject.AsObservable();
         
         private IDisposable _jumpStartSubscription;
         private IDisposable _runSubscription;
-        private IDisposable _turnSubscription;
         private IDisposable _gravityScaleSubscription;
         private IDisposable _fallSpeedCapSubscription;
         
@@ -44,7 +41,6 @@ namespace WhereIsMyWife.Player.State
         {
             _jumpStartSubscription?.Dispose();
             _runSubscription?.Dispose();
-            _turnSubscription?.Dispose();
             _gravityScaleSubscription?.Dispose();
             _fallSpeedCapSubscription?.Dispose();
         }

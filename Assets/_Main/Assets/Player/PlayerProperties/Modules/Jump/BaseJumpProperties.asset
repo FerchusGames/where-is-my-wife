@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: BaseJumpProperties
   m_EditorClassIdentifier: 
   <ForceMagnitude>k__BackingField: 18
-  <CoyoteTime>k__BackingField: 0.2
-  <InputBufferTime>k__BackingField: 0.15
+  <CoyoteTime>k__BackingField: 0.1
+  <InputBufferTime>k__BackingField: 0.1
   <HangTimeThreshold>k__BackingField: 3
   <HangAccelerationMultiplier>k__BackingField: 2
   <HangMaxSpeedMultiplier>k__BackingField: 1.1
