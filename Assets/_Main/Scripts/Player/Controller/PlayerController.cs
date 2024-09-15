@@ -1,4 +1,3 @@
-using System;
 using UniRx;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -6,36 +5,6 @@ using Zenject;
 
 namespace WhereIsMyWife.Controllers
 {
-    public interface IPlayerControllerInput
-    {
-        IObservable<float> JumpStart { get; }
-        IObservable<Unit> JumpEnd { get; }
-        IObservable<float> Run { get; }
-        IObservable<Vector2> DashStart { get; }
-        IObservable<Unit> DashEnd { get; }
-        IObservable<Unit> Turn { get; }
-        IObservable<float> GravityScale { get; }
-        IObservable<float> FallSpeedCap { get; }
-    }
-
-    public interface IPlayerControllerEvent
-    {
-        void SetPlayerControllerData(IPlayerControllerData playerControllerData);
-    }
-    
-    public interface IRespawn
-    {
-        public void SetRespawnPoint(Vector3 respawnPoint);
-        public void TriggerRespawn();
-        public IObservable<Vector3> RespawnAction { get; }
-    }
-
-    public interface IPlayerControllerData
-    {
-       public Vector2 RigidbodyVelocity { get; }
-       public Vector2 GroundCheckPosition { get; }
-    }
-    
     public partial class PlayerController : IPlayerControllerData
     {
         public Vector2 RigidbodyVelocity => _rigidbody2D.velocity;

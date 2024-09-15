@@ -1,0 +1,18 @@
+﻿namespace WhereIsMyWife.Managers
+{
+    public interface IPlayerStateIndicator
+    {
+        public bool IsDead { get; }
+        public bool IsFacingRight { get; }
+        public bool IsJumping { get; }
+        public bool IsJumpCut { get; }
+        public bool IsJumpFalling { get; }
+        public bool IsOnJumpInputBuffer();
+        public bool IsFastFalling();
+        public bool IsOnGround();
+        public bool IsInJumpHang();
+        public bool IsIdling();
+        public bool CanJump();
+        public bool CanJumpCut();
+    }
+}
