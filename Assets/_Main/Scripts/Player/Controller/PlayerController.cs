@@ -1,6 +1,8 @@
+using System;
 using UniRx;
 using UnityEngine;
 using UnityEngine.Serialization;
+using WhereIsMyWife.Managers;
 using WhereIsMyWife.Player.State;
 using Zenject;
 
@@ -15,6 +17,7 @@ namespace WhereIsMyWife.Controllers
     public partial class PlayerController : MonoBehaviour
     {
         [Inject] private IMovementStateEvents _movementStateEvents;
+        [Inject] private IPlayerStateIndicator _playerStateIndicator;
         [Inject] private IPlayerControllerEvent _playerControllerEvent;
         [Inject] private IRespawn _respawn;
 
@@ -28,6 +31,11 @@ namespace WhereIsMyWife.Controllers
             SubscribeToObservables();
         }
 
+        private void Update()
+        {
+            
+        }
+
         private void SubscribeToObservables()
         {
             _movementStateEvents.JumpStart.Subscribe(JumpStart).AddTo(this);
@@ -37,7 +45,6 @@ namespace WhereIsMyWife.Controllers
             
             _movementStateEvents.GravityScale.Subscribe(SetGravityScale).AddTo(this);
             _movementStateEvents.FallSpeedCap.Subscribe(SetFallSpeedCap).AddTo(this);
-            _movementStateEvents.Turn.Subscribe(Turn).AddTo(this);
             
             _respawn.RespawnAction.Subscribe(Respawn).AddTo(this);
         }
@@ -49,14 +56,8 @@ namespace WhereIsMyWife.Controllers
 
         private void Run(float runAcceleration)
         {
+            FaceDirection(_playerStateIndicator.IsRunningRight);
             _rigidbody2D.AddForce(Vector2.right * runAcceleration, ForceMode2D.Force);
-        }
-
-        private void Turn()
-        {
-            Vector3 scale = transform.localScale;
-            scale.x *= -1;
-            transform.localScale = scale;
         }
 
         private void DashStart(Vector2 dashForce)
@@ -75,6 +76,23 @@ namespace WhereIsMyWife.Controllers
                 Mathf.Max(_rigidbody2D.velocity.y, -fallSpeedCap));
         }
 
+        private void FaceDirection(bool shouldFaceRight)
+        {
+            Vector3 scale = transform.localScale;
+            
+            if (shouldFaceRight)
+            {
+                scale.x = 1;
+            }
+
+            else
+            {
+                scale.x = -1;
+            }
+
+            transform.localScale = scale;
+        }
+        
         private void Respawn(Vector3 respawnPosition)
         {
             transform.position = respawnPosition;

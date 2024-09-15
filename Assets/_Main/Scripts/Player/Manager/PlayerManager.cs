@@ -56,7 +56,7 @@ namespace WhereIsMyWife.Managers
     public partial class PlayerManager : IPlayerStateIndicator
     {
         public bool IsDead { get; private set; } = false;
-        public bool IsFacingRight { get; private set; } = true;
+        public bool IsRunningRight { get; private set; } = true;
         public bool IsJumping { get; private set; } = false;
         public bool IsJumpCut { get; private set; } = false;
         public bool IsJumpFalling { get; private set; } = false;
@@ -109,7 +109,6 @@ namespace WhereIsMyWife.Managers
         private Subject<Vector2> _dashStartSubject = new Subject<Vector2>();
         private Subject<float> _gravityScaleSubject = new Subject<float>();
         private Subject<float> _fallSpeedCapSubject = new Subject<float>();
-        private Subject<Unit> _turnSubject = new Subject<Unit>();
 
         public IObservable<float> JumpStart => _jumpStartSubject.AsObservable();
         public IObservable<Unit> JumpEnd => _jumpEndSubject.AsObservable();
@@ -117,8 +116,7 @@ namespace WhereIsMyWife.Managers
         public IObservable<Vector2> DashStart => _dashStartSubject.AsObservable();
         public IObservable<float> GravityScale => _gravityScaleSubject.AsObservable();
         public IObservable<float> FallSpeedCap => _fallSpeedCapSubject.AsObservable();
-        public IObservable<Unit> Turn => _turnSubject.AsObservable();
-        
+
         private void ExecuteJumpStartEvent()
         {
             _lastPressedJumpTime = _properties.Jump.InputBufferTime;
@@ -137,20 +135,10 @@ namespace WhereIsMyWife.Managers
             if (runDirection != 0)
             {
                 bool isMovingRight = runDirection > 0;
-                CheckDirectionToFace(isMovingRight);
                 PlayAnimationState(WALK_ANIMATION_STATE);   
             }
             
             _runSubject.OnNext(_runningMethods.GetRunAcceleration(runDirection, _controllerData.RigidbodyVelocity.x));
-        }
-
-        private void CheckDirectionToFace(bool isMovingRight)
-        {
-            if (isMovingRight != IsFacingRight)
-            {
-                _turnSubject.OnNext();
-                IsFacingRight = !IsFacingRight;
-            }
         }
 
         private void ExecuteDashStartEvent(Vector2 dashDirection)
@@ -200,8 +188,26 @@ namespace WhereIsMyWife.Managers
             TickTimers();
             GroundCheck();
             JumpChecks();
+            CheckRunningDirection();
             GravityShifts();
             Idle();
+        }
+
+        private void CheckRunningDirection()
+        {
+            if (!_runningMethods.GetIsAccelerating()) return;
+            
+            float velocityThreshold = 1f;
+            
+            if (_controllerData.RigidbodyVelocity.x >= velocityThreshold)
+            {
+                IsRunningRight = true;
+            }
+            
+            else if (_controllerData.RigidbodyVelocity.x <= -velocityThreshold)
+            {
+                IsRunningRight = false;
+            }
         }
 
         private void Idle()

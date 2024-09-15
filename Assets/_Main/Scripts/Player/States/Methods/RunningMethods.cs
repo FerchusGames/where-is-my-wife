@@ -6,6 +6,8 @@ using Zenject;
 public interface IRunningMethods
 {
     public float GetRunAcceleration(float runDirection, float currentVelocityX);
+    
+    public bool GetIsAccelerating();
 }
 
 public class RunningMethods : IRunningMethods
@@ -48,7 +50,7 @@ public class RunningMethods : IRunningMethods
     
     private float GetGroundAccelerationRate()
     {
-        if (IsAccelerating())
+        if (GetIsAccelerating())
         {
             return _movementProperties.RunAccelerationRate;
         }
@@ -58,7 +60,7 @@ public class RunningMethods : IRunningMethods
     
     private float GetAirAccelerationRate()
     {
-        if (IsAccelerating())
+        if (GetIsAccelerating())
         {
             return _movementProperties.RunAccelerationRate 
                    * _movementProperties.AirAccelerationMultiplier;
@@ -68,7 +70,7 @@ public class RunningMethods : IRunningMethods
                * _movementProperties.AirDecelerationMultiplier;
     }
     
-    private bool IsAccelerating()
+    public bool GetIsAccelerating()
     {
         return Mathf.Abs(_targetSpeed) > 0.01f;
     }

@@ -34,7 +34,6 @@ namespace WhereIsMyWife.Player.State
         {
             _jumpStartSubscription = _playerStateInput.JumpStart.Subscribe(_jumpStartSubject.OnNext);
             _runSubscription = _playerStateInput.Run.Subscribe(_runSubject.OnNext);
-            _turnSubscription = _playerStateInput.Turn.Subscribe(_turnSubject.OnNext);
             _gravityScaleSubscription = _playerStateInput.GravityScale.Subscribe(_gravityScaleSubject.OnNext);
             _fallSpeedCapSubscription = _playerStateInput.FallSpeedCap.Subscribe(_fallSpeedCapSubject.OnNext);
 
