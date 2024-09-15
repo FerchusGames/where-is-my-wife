@@ -12,17 +12,21 @@ namespace WhereIsMyWife.Controllers
     {
         public Vector2 RigidbodyVelocity => _rigidbody2D.velocity;
         public Vector2 GroundCheckPosition => _groundCheckTransform.position;
+        public Vector2 WallHangCheckPosition => _wallHangCheckTransform.position;
     }
     
     public partial class PlayerController : MonoBehaviour
     {
         [Inject] private IMovementStateEvents _movementStateEvents;
+        [Inject] private IWallHangStateEvents _wallHangStateEvents;
+        
         [Inject] private IPlayerStateIndicator _playerStateIndicator;
         [Inject] private IPlayerControllerEvent _playerControllerEvent;
         [Inject] private IRespawn _respawn;
 
         [SerializeField] private Rigidbody2D _rigidbody2D;
         [SerializeField] private Transform _groundCheckTransform = null;
+        [SerializeField] private Transform _wallHangCheckTransform = null;
         
         private void Start()
         {
@@ -45,6 +49,8 @@ namespace WhereIsMyWife.Controllers
             
             _movementStateEvents.GravityScale.Subscribe(SetGravityScale).AddTo(this);
             _movementStateEvents.FallSpeedCap.Subscribe(SetFallSpeedCap).AddTo(this);
+
+            _wallHangStateEvents.WallHangVelocity.Subscribe(WallHangVelocity).AddTo(this);
             
             _respawn.RespawnAction.Subscribe(Respawn).AddTo(this);
         }
@@ -76,6 +82,13 @@ namespace WhereIsMyWife.Controllers
                 Mathf.Max(_rigidbody2D.velocity.y, -fallSpeedCap));
         }
 
+        private void WallHangVelocity(float fallVelocity)
+        {
+            SetGravityScale(0f);
+            _rigidbody2D.velocity = new Vector2(_rigidbody2D.velocity.x,
+                fallVelocity);
+        }
+        
         private void FaceDirection(bool shouldFaceRight)
         {
             Vector3 scale = transform.localScale;

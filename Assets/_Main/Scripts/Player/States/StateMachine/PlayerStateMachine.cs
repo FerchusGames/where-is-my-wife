@@ -10,16 +10,18 @@ namespace WhereIsMyWife.Player.StateMachine
             Movement,
             Dash,
             Hook,
-            Dead,
-            Cinematic
+            WallHang,
+            WallJump,
         }
         [Inject] private IMovementState _movementState;
         [Inject] private IDashState _dashState;
+        [Inject] private IWallHangState _wallHangState;
         
         private void Awake()
         {
             States[PlayerState.Movement] = _movementState;
             States[PlayerState.Dash] = _dashState;
+            States[PlayerState.WallHang] = _wallHangState;
             
             CurrentState = States[PlayerState.Movement];
         }

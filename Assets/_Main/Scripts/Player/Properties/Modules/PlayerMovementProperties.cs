@@ -9,6 +9,8 @@ namespace WhereIsMyWife.Managers.Properties
         public float RunDecelerationRate { get; }
         public float AirAccelerationMultiplier { get; }
         public float AirDecelerationMultiplier { get; }
+        public float WallSlideMaxVelocity { get; }
+        public float WallSlideTimeToMaxVelocity { get; }
     }
 
     [CreateAssetMenu(menuName = "ScriptableObjects/PlayerProperties/Modules/MovementProperties", fileName = "MovementProperties")]
@@ -19,6 +21,8 @@ namespace WhereIsMyWife.Managers.Properties
         [field: SerializeField] public float RunDecelerationRate { get; private set; }
         [field: SerializeField] public float AirAccelerationMultiplier { get; private set; }
         [field: SerializeField] public float AirDecelerationMultiplier { get; private set; }
+        [field: SerializeField] public float WallSlideMaxVelocity { get; private set; }
+        [field: SerializeField] public float WallSlideTimeToMaxVelocity { get; private set; }
     }
 
 }

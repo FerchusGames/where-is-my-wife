@@ -34,6 +34,7 @@ namespace WhereIsMyWife.Player.State
             _gravityScaleSubscription = _playerStateInput.GravityScale.Subscribe(_gravityScaleSubject.OnNext);
             _fallSpeedCapSubscription = _playerStateInput.FallSpeedCap.Subscribe(_fallSpeedCapSubject.OnNext);
 
+            _playerStateInput.WallHangStart.Subscribe(WallHang);
             _playerStateInput.DashStart.AsUnitObservable().Subscribe(Dash);
         }
 
@@ -48,6 +49,11 @@ namespace WhereIsMyWife.Player.State
         private void Dash()
         {
             NextState = PlayerStateMachine.PlayerState.Dash;
+        }
+
+        private void WallHang()
+        {
+            NextState = PlayerStateMachine.PlayerState.WallHang;
         }
     }
 }

@@ -21,4 +21,14 @@ namespace WhereIsMyWife.Controllers
     {
         
     }
+
+    public interface IWallHangStateEvents
+    {
+        IObservable<float> WallHangVelocity { get; }
+    }
+
+    public interface IWallJumpStateEvents
+    {
+        
+    }
 }

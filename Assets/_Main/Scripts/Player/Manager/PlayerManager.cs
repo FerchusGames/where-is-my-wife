@@ -80,12 +80,14 @@ namespace WhereIsMyWife.Managers
         private Subject<Unit> _jumpEndSubject = new Subject<Unit>();
         private Subject<float> _runSubject = new Subject<float>();
         private Subject<Vector2> _dashStartSubject = new Subject<Vector2>();
+        private Subject<Unit> _wallHangStartSubject = new Subject<Unit>();
         private Subject<float> _gravityScaleSubject = new Subject<float>();
         private Subject<float> _fallSpeedCapSubject = new Subject<float>();
 
         public IObservable<float> JumpStart => _jumpStartSubject.AsObservable();
         public IObservable<Unit> JumpEnd => _jumpEndSubject.AsObservable();
         public IObservable<float> Run => _runSubject.AsObservable();
+        public IObservable<Unit> WallHangStart => _wallHangStartSubject.AsObservable();
         public IObservable<Vector2> DashStart => _dashStartSubject.AsObservable();
         public IObservable<float> GravityScale => _gravityScaleSubject.AsObservable();
         public IObservable<float> FallSpeedCap => _fallSpeedCapSubject.AsObservable();
@@ -159,6 +161,7 @@ namespace WhereIsMyWife.Managers
         {
             TickTimers();
             GroundCheck();
+            WallCheck();
             JumpChecks();
             CheckRunningDirection();
             GravityShifts();
@@ -205,7 +208,21 @@ namespace WhereIsMyWife.Managers
             return Physics2D.OverlapBox(_controllerData.GroundCheckPosition, _properties.Check.GroundCheckSize, 0,
                 _properties.Check.GroundLayer);
         }
-        
+
+        private void WallCheck()
+        {
+            if (GetWallCheckOverlapBox() && (IsJumping || IsRunFalling))
+            {
+                _wallHangStartSubject.OnNext();
+            }
+        }
+
+        private Collider2D GetWallCheckOverlapBox()
+        {
+            return Physics2D.OverlapBox(_controllerData.WallHangCheckPosition, _properties.Check.WallHangCheckSize,
+                0, _properties.Check.GroundLayer);
+        }
+
         private void JumpChecks()
         {
             JumpingCheck();
