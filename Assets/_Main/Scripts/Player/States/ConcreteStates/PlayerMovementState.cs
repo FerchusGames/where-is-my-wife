@@ -3,6 +3,7 @@ using UniRx;
 using UnityEngine;
 using WhereIsMyWife.Controllers;
 using WhereIsMyWife.Player.StateMachine;
+using Zenject;
 
 namespace WhereIsMyWife.Player.State
 {

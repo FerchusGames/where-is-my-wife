@@ -1,4 +1,5 @@
 using WhereIsMyWife.Player.State;
+using Zenject;
 
 namespace WhereIsMyWife.Player.StateMachine
 {
@@ -13,9 +14,11 @@ namespace WhereIsMyWife.Player.StateMachine
             Cinematic
         }
 
+        [Inject] private IBaseState<PlayerStateMachine.PlayerState> _movementState;
+        
         private void Awake()
         {
-            States[PlayerState.Movement] = new PlayerMovementState();
+            States[PlayerState.Movement] = _movementState;
             
             CurrentState = States[PlayerState.Movement];
         }

@@ -5,8 +5,8 @@ using Zenject;
 
 public abstract class StateManager<EState> : MonoBehaviour where EState : Enum
 {
-    protected Dictionary<EState, BaseState<EState>> States = new Dictionary<EState, BaseState<EState>>();
-    protected BaseState<EState> CurrentState;
+    protected Dictionary<EState, IBaseState<EState>> States = new Dictionary<EState, IBaseState<EState>>();
+    protected IBaseState<EState> CurrentState;
     
     protected bool IsTransitioningState = false;
 

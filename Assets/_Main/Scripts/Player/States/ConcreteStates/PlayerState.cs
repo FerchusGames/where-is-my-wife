@@ -4,35 +4,38 @@ using Zenject;
 
 namespace WhereIsMyWife.Player.State
 {
-    public class PlayerState : BaseState<PlayerStateMachine.PlayerState>
+    public class PlayerState : IBaseState<PlayerStateMachine.PlayerState>
     {
-        [Inject] protected IPlayerStateInput _playerStateInput;
-        
-        public PlayerState(PlayerStateMachine.PlayerState key) : base(key)
+        public PlayerState(PlayerStateMachine.PlayerState stateKey)
         {
+            StateKey = stateKey;
         }
+        
+        [Inject] protected IPlayerStateInput _playerStateInput;
         
         protected virtual void SubscribeToObservables() {}
         protected virtual void UnsubscribeToObservables() {}
 
-        public override void EnterState()
+        public void EnterState()
         {
             SubscribeToObservables();
         }
 
-        public override void ExitState()
+        public void ExitState()
         {
             UnsubscribeToObservables();
         }
 
-        public override void UpdateState() { }
+        public void UpdateState() { }
 
-        public override void FixedUpdateState() { }
-        public override void OnTriggerEnter2D(Collider2D other) { }
+        public void FixedUpdateState() { }
+        public PlayerStateMachine.PlayerState NextState { get; protected set; }
+        public PlayerStateMachine.PlayerState StateKey { get; protected set; }
+        public void OnTriggerEnter2D(Collider2D other) { }
 
-        public override void OnTriggerStay2D(Collider2D other) { }
+        public void OnTriggerStay2D(Collider2D other) { }
 
-        public override void OnTriggerExit2D(Collider2D other) { }
+        public void OnTriggerExit2D(Collider2D other) { }
     }
 
 }
