@@ -1,8 +1,10 @@
 using UnityEngine;
+using WhereIsMyWife.Controllers;
 using WhereIsMyWife.Databases;
 using WhereIsMyWife.Managers;
 using WhereIsMyWife.Managers.Properties;
 using WhereIsMyWife.Player.State;
+using WhereIsMyWife.Player.StateMachine;
 using Zenject;
 
 namespace WhereIsMyWife
@@ -63,6 +65,7 @@ namespace WhereIsMyWife
         private void InstallPlayerStates()
         {
             Container.BindInterfacesTo<PlayerMovementState>().AsSingle();
+            Container.BindInterfacesTo<PlayerDashState>().AsSingle();
         }
     }
 }

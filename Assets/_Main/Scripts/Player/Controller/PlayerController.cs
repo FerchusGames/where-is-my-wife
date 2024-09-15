@@ -49,7 +49,6 @@ namespace WhereIsMyWife.Controllers
 
         private void Run(float runAcceleration)
         {
-            Debug.Log($"Run Accceleration: {runAcceleration}");
             _rigidbody2D.AddForce(Vector2.right * runAcceleration, ForceMode2D.Force);
         }
 

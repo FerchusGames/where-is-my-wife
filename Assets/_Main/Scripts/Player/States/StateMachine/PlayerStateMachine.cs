@@ -13,12 +13,13 @@ namespace WhereIsMyWife.Player.StateMachine
             Dead,
             Cinematic
         }
-
-        [Inject] private IBaseState<PlayerStateMachine.PlayerState> _movementState;
+        [Inject] private IMovementState _movementState;
+        [Inject] private IDashState _dashState;
         
         private void Awake()
         {
             States[PlayerState.Movement] = _movementState;
+            States[PlayerState.Dash] = _dashState;
             
             CurrentState = States[PlayerState.Movement];
         }

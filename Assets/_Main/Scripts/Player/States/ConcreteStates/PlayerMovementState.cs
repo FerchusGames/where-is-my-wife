@@ -3,11 +3,10 @@ using UniRx;
 using UnityEngine;
 using WhereIsMyWife.Controllers;
 using WhereIsMyWife.Player.StateMachine;
-using Zenject;
 
 namespace WhereIsMyWife.Player.State
 {
-    public class PlayerMovementState : PlayerState, IMovementStateEvents
+    public class PlayerMovementState : PlayerState, IMovementState, IMovementStateEvents
     {
         public PlayerMovementState() : base(PlayerStateMachine.PlayerState.Movement) { }
         
@@ -38,16 +37,22 @@ namespace WhereIsMyWife.Player.State
             _turnSubscription = _playerStateInput.Turn.Subscribe(_turnSubject.OnNext);
             _gravityScaleSubscription = _playerStateInput.GravityScale.Subscribe(_gravityScaleSubject.OnNext);
             _fallSpeedCapSubscription = _playerStateInput.FallSpeedCap.Subscribe(_fallSpeedCapSubject.OnNext);
+
+            _playerStateInput.DashStart.AsUnitObservable().Subscribe(Dash);
         }
 
         protected override void UnsubscribeToObservables()
         {
-            // Dispose of the subscriptions to unsubscribe
             _jumpStartSubscription?.Dispose();
             _runSubscription?.Dispose();
             _turnSubscription?.Dispose();
             _gravityScaleSubscription?.Dispose();
             _fallSpeedCapSubscription?.Dispose();
+        }
+
+        private void Dash()
+        {
+            NextState = PlayerStateMachine.PlayerState.Dash;
         }
     }
 }
