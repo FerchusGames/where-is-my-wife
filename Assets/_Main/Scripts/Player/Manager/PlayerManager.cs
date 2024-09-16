@@ -107,11 +107,7 @@ namespace WhereIsMyWife.Managers
         
         private void ExecuteRunEvent(float runDirection)
         {
-            if (runDirection != 0)
-            {
-                bool isMovingRight = runDirection > 0;
-            }
-            
+            UpdateIsRunningRight(runDirection);
             _runSubject.OnNext(_runningMethods.GetRunAcceleration(runDirection, _controllerData.RigidbodyVelocity.x));
         }
 
@@ -163,22 +159,17 @@ namespace WhereIsMyWife.Managers
             GroundCheck();
             WallCheck();
             JumpChecks();
-            CheckRunningDirection();
             GravityShifts();
         }
 
-        private void CheckRunningDirection()
+        private void UpdateIsRunningRight(float runDirection)
         {
-            if (!_runningMethods.GetIsAccelerating()) return;
-            
-            float velocityThreshold = 1f;
-            
-            if (_controllerData.RigidbodyVelocity.x >= velocityThreshold)
+            if (runDirection > 0)
             {
                 IsRunningRight = true;
             }
             
-            else if (_controllerData.RigidbodyVelocity.x <= -velocityThreshold)
+            else if (runDirection < 0)
             {
                 IsRunningRight = false;
             }

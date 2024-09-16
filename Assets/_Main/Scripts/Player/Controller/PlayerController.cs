@@ -1,4 +1,5 @@
 using System;
+using Cysharp.Threading.Tasks;
 using UniRx;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -51,6 +52,7 @@ namespace WhereIsMyWife.Controllers
             _movementStateEvents.FallSpeedCap.Subscribe(SetFallSpeedCap).AddTo(this);
 
             _wallHangStateEvents.WallHangVelocity.Subscribe(WallHangVelocity).AddTo(this);
+            _wallHangStateEvents.Turn.Subscribe(Turn).AddTo(this);
             
             _respawn.RespawnAction.Subscribe(Respawn).AddTo(this);
         }
@@ -87,6 +89,15 @@ namespace WhereIsMyWife.Controllers
             SetGravityScale(0f);
             _rigidbody2D.velocity = new Vector2(_rigidbody2D.velocity.x,
                 fallVelocity);
+        }
+
+        private void Turn()
+        {
+            Vector3 scale = transform.localScale;
+
+            scale.x *= -1;
+            
+            transform.localScale = scale;
         }
         
         private void FaceDirection(bool shouldFaceRight)

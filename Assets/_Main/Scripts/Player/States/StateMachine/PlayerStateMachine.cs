@@ -25,5 +25,7 @@ namespace WhereIsMyWife.Player.StateMachine
             
             CurrentState = States[PlayerState.Movement];
         }
+        
+        
     }
 }

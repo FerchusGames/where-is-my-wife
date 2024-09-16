@@ -34,7 +34,6 @@ public class PlayerDashState : PlayerState, IDashState, IDashStateEvents
     public override void EnterState()
     {
         base.EnterState();
-        Debug.Log("Started Dash");
         _timer = 0;
     }
 
@@ -50,6 +49,5 @@ public class PlayerDashState : PlayerState, IDashState, IDashStateEvents
 
     public override void ExitState()
     {
-        Debug.Log("Exited Dash");
     }
 }

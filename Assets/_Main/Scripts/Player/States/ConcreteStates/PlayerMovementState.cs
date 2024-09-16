@@ -10,10 +10,10 @@ namespace WhereIsMyWife.Player.State
     {
         public PlayerMovementState() : base(PlayerStateMachine.PlayerState.Movement) { }
         
-        private ISubject<float> _jumpStartSubject = new Subject<float>();
-        private ISubject<float> _runSubject = new Subject<float>();
-        private ISubject<float> _gravityScaleSubject = new Subject<float>();
-        private ISubject<float> _fallSpeedCapSubject = new Subject<float>();
+        private Subject<float> _jumpStartSubject = new Subject<float>();
+        private Subject<float> _runSubject = new Subject<float>();
+        private Subject<float> _gravityScaleSubject = new Subject<float>();
+        private Subject<float> _fallSpeedCapSubject = new Subject<float>();
 
         public IObservable<float> JumpStart => _jumpStartSubject.AsObservable();
         public IObservable<float> Run => _runSubject.AsObservable();

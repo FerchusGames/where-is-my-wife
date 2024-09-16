@@ -28,11 +28,13 @@ namespace WhereIsMyWife.Player.State
         public virtual void EnterState()
         {
             NextState = StateKey;
+            Debug.Log($"Entering {StateKey}");
             SubscribeToObservables();
         }
 
         public virtual void ExitState()
         {
+            Debug.Log($"Exiting {StateKey}");
             UnsubscribeToObservables();
         }
 
