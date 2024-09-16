@@ -28,9 +28,9 @@ namespace WhereIsMyWife.Controllers
         IObservable<float> WallHangVelocity { get; }
         IObservable<Unit> Turn { get; }
     }
-
+    
     public interface IWallJumpStateEvents
     {
-        
+        IObservable<float> WallJumpVelocity { get; }
     }
 }
