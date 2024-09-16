@@ -206,7 +206,7 @@ namespace WhereIsMyWife.Managers
 
         private void WallCheck()
         {
-            if (GetWallCheckOverlapBox())
+            if (GetWallHangCheck())
             {
                 if ((IsJumping || IsRunFalling))
                 {
@@ -220,10 +220,14 @@ namespace WhereIsMyWife.Managers
             }
         }
 
-        private Collider2D GetWallCheckOverlapBox()
+        private bool GetWallHangCheck()
         {
-            return Physics2D.OverlapBox(_controllerData.WallHangCheckPosition, _properties.Check.WallHangCheckSize,
-                0, _properties.Check.GroundLayer);
+            return (Physics2D.OverlapBox(_controllerData.WallHangCheckUpPosition, _properties.Check.WallHangCheckSize,
+                0, _properties.Check.GroundLayer)
+                &&
+                Physics2D.OverlapBox(_controllerData.WallHangCheckDownPosition, _properties.Check.WallHangCheckSize,
+                    0, _properties.Check.GroundLayer)
+                );
         }
 
         private void JumpChecks()

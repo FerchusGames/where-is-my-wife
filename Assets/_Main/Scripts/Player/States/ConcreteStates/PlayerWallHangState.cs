@@ -14,9 +14,11 @@ namespace WhereIsMyWife.Player.State
     {
         public PlayerWallHangState() : base(PlayerStateMachine.PlayerState.WallHang) { }
         
+        private Subject<Unit> _startWallHang = new Subject<Unit>();
         private Subject<float> _wallHangGravitySubject = new Subject<float>();
         private Subject<Unit> _turnSubject = new Subject<Unit>();
-        
+
+        public IObservable<Unit> StartWallHang => _startWallHang.AsObservable();
         public IObservable<float> WallHangVelocity => _wallHangGravitySubject.AsObservable();
         public IObservable<Unit> Turn => _turnSubject.AsObservable();
 
@@ -44,15 +46,17 @@ namespace WhereIsMyWife.Player.State
         public override void EnterState()
         {
             base.EnterState();
-            _slideSpeed = 0;
-
+            
             _initialFacingDirection = _stateIndicator.IsRunningRight;
+            _startWallHang.OnNext();
             
             StartSlideSpeedCurve();
         }
 
         private void StartSlideSpeedCurve()
         {
+            _slideSpeed = 0;
+            
             _slideTween = DOTween.To(() => _slideSpeed, x => _slideSpeed = x, 
                     -_movementProperties.WallSlideMaxVelocity, 
                     _movementProperties.WallSlideTimeToMaxVelocity)

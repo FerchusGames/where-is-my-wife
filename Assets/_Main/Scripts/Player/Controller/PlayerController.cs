@@ -13,7 +13,8 @@ namespace WhereIsMyWife.Controllers
     {
         public Vector2 RigidbodyVelocity => _rigidbody2D.velocity;
         public Vector2 GroundCheckPosition => _groundCheckTransform.position;
-        public Vector2 WallHangCheckPosition => _wallHangCheckTransform.position;
+        public Vector2 WallHangCheckUpPosition => _wallHangCheckUpTransform.position;
+        public Vector2 WallHangCheckDownPosition => _wallHangCheckDownTransform.position;
     }
     
     public partial class PlayerController : MonoBehaviour
@@ -27,7 +28,8 @@ namespace WhereIsMyWife.Controllers
 
         [SerializeField] private Rigidbody2D _rigidbody2D;
         [SerializeField] private Transform _groundCheckTransform = null;
-        [SerializeField] private Transform _wallHangCheckTransform = null;
+        [SerializeField] private Transform _wallHangCheckUpTransform = null;
+        [SerializeField] private Transform _wallHangCheckDownTransform = null;
         
         private void Start()
         {
