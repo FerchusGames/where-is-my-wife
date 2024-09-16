@@ -9,8 +9,10 @@ namespace WhereIsMyWife.Player.State
         IObservable<float> JumpStart { get; }
         IObservable<float> Run { get; }
         IObservable<Unit> WallHangStart { get; }
+        IObservable<Unit> WallHangEnd { get; }
         IObservable<Vector2> DashStart { get; }
         IObservable<float> GravityScale { get; }
         IObservable<float> FallSpeedCap { get; }
+        IObservable<Unit> Land { get; }
     }
 }

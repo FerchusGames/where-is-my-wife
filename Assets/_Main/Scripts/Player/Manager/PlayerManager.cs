@@ -81,16 +81,20 @@ namespace WhereIsMyWife.Managers
         private Subject<float> _runSubject = new Subject<float>();
         private Subject<Vector2> _dashStartSubject = new Subject<Vector2>();
         private Subject<Unit> _wallHangStartSubject = new Subject<Unit>();
+        private Subject<Unit> _wallHangEndSubject = new Subject<Unit>();
         private Subject<float> _gravityScaleSubject = new Subject<float>();
         private Subject<float> _fallSpeedCapSubject = new Subject<float>();
+        private Subject<Unit> _landSubject = new Subject<Unit>();
 
         public IObservable<float> JumpStart => _jumpStartSubject.AsObservable();
         public IObservable<Unit> JumpEnd => _jumpEndSubject.AsObservable();
         public IObservable<float> Run => _runSubject.AsObservable();
         public IObservable<Unit> WallHangStart => _wallHangStartSubject.AsObservable();
+        public IObservable<Unit> WallHangEnd => _wallHangEndSubject.AsObservable();
         public IObservable<Vector2> DashStart => _dashStartSubject.AsObservable();
         public IObservable<float> GravityScale => _gravityScaleSubject.AsObservable();
         public IObservable<float> FallSpeedCap => _fallSpeedCapSubject.AsObservable();
+        public IObservable<Unit> Land => _landSubject.AsUnitObservable();
 
         private void ExecuteJumpStartEvent()
         {
@@ -202,9 +206,17 @@ namespace WhereIsMyWife.Managers
 
         private void WallCheck()
         {
-            if (GetWallCheckOverlapBox() && (IsJumping || IsRunFalling))
+            if (GetWallCheckOverlapBox())
             {
-                _wallHangStartSubject.OnNext();
+                if ((IsJumping || IsRunFalling))
+                {
+                    _wallHangStartSubject.OnNext();
+                }
+            }
+
+            else
+            {
+                _wallHangEndSubject.OnNext();
             }
         }
 
@@ -217,7 +229,7 @@ namespace WhereIsMyWife.Managers
         private void JumpChecks()
         {
             JumpingCheck();
-            JumpStopCheck();
+            LandCheck();
 
             if (CanJump() && _lastPressedJumpTime > 0)
             {
@@ -239,12 +251,13 @@ namespace WhereIsMyWife.Managers
             }
         }
 
-        private void JumpStopCheck()
+        private void LandCheck()
         {
             if (_lastOnGroundTime > 0 && !IsJumping)
             {
                 IsJumpCut = false;
                 IsJumpFalling = false;
+                _landSubject.OnNext();
             }
         }
         

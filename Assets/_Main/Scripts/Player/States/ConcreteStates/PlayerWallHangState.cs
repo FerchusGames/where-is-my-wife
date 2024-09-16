@@ -32,6 +32,8 @@ namespace WhereIsMyWife.Player.State
         {
             _playerStateInput.DashStart.AsUnitObservable().Subscribe(Dash);
             _playerStateInput.JumpStart.AsUnitObservable().Subscribe(Jump);
+            _playerStateInput.Land.Subscribe(TurnAndCancelWallHang);
+            _playerStateInput.WallHangEnd.Subscribe(CancelWallHang);
         }
 
         protected override void UnsubscribeToObservables()
@@ -76,7 +78,7 @@ namespace WhereIsMyWife.Player.State
         {
             if (PlayerIsGoingOppositeDirectionOfWall())
             {
-                CancelWallHang();
+                TurnAndCancelWallHang();
             }
             
             _wallHangGravitySubject.OnNext(_slideSpeed);
@@ -87,12 +89,17 @@ namespace WhereIsMyWife.Player.State
             return _initialFacingDirection != _stateIndicator.IsRunningRight;
         }
 
-        private void CancelWallHang()
+        private void TurnAndCancelWallHang()
         {
             _turnSubject.OnNext();
+            CancelWallHang();
+        }
+
+        private void CancelWallHang()
+        {
             NextState = PlayerStateMachine.PlayerState.Movement;
         }
-        
+
         private void Dash()
         {
             _turnSubject.OnNext();
