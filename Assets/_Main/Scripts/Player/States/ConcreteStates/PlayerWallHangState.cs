@@ -41,8 +41,7 @@ namespace WhereIsMyWife.Player.State
             _dashStartSubscription = _playerStateInput.DashStart.AsUnitObservable().Subscribe(Dash);
             _wallJumpStartSubscription = _playerStateInput.JumpStart.Subscribe(Jump);
             _landSubscription = _playerStateInput.Land.Subscribe(TurnAndCancelWallHang);
-            _wallHangEndSubscription = _playerStateInput.WallHangEnd.Subscribe(CancelWallHang);
-            
+            _wallHangEndSubscription = _playerStateInput.WallHangEnd.Subscribe(TurnAndCancelWallHang);
         }
 
         protected override void UnsubscribeToObservables()

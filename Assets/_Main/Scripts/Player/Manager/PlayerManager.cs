@@ -232,6 +232,8 @@ namespace WhereIsMyWife.Managers
                 &&
                 Physics2D.OverlapBox(_controllerData.WallHangCheckDownPosition, _properties.Check.WallHangCheckSize,
                     0, _properties.Check.GroundLayer)
+                &&
+                IsAccelerating
                 );
         }
 

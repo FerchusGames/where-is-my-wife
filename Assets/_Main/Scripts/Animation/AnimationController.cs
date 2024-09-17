@@ -39,6 +39,7 @@ namespace WhereIsMyWife.Controllers
             _movementStateEvents.Run.AsUnitObservable().Subscribe(Run);
 
             _wallHangStateEvents.StartWallHang.Subscribe(StartWallHang);
+            _wallHangStateEvents.WallJumpStart.AsUnitObservable().Subscribe(Fall);
         }
 
         private void Jump()
@@ -46,6 +47,11 @@ namespace WhereIsMyWife.Controllers
             PlayAnimationState(JUMP_ANIMATION_STATE);
         }
 
+        private void Fall()
+        {
+            PlayAnimationState(FALL_ANIMATION_STATE);
+        }
+        
         private void Run()
         {
             if (!_stateIndicator.IsJumping)

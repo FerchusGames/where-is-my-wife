@@ -39,6 +39,10 @@ namespace WhereIsMyWife.Player.State
         private float _timer = 0;
         private float _minWallJumpDuration = 0.2f;
         private float _wallJumpSpeed = 15f;
+        private float _timeToNormalSpeed = 0.23f;
+        private float _timeToZeroSpeed = 0.5f;
+
+        private bool _minTimeHasPassed = false;
         
         protected override void SubscribeToObservables()
         {
@@ -61,14 +65,21 @@ namespace WhereIsMyWife.Player.State
             base.EnterState();
 
             _timer = 0;
+            _minTimeHasPassed = false;
             _isLookingRightAtStart = _stateIndicator.IsLookingRight;
             _directionMultiplier = _stateIndicator.IsLookingRight ? 1 : -1;
-            _horizontalSpeed = _wallJumpSpeed * _directionMultiplier;
+            StartJumpSpeedCurve();
+        }
+
+        public override void ExitState()
+        {
+            base.ExitState();
+            _horizontalSpeedTween.Kill();
         }
 
         public override void UpdateState()
         {
-            if (PlayerChangesDirection() && MinJumpTimeHasPassed())
+            if (_stateIndicator.IsAccelerating && _minTimeHasPassed)
             {
                 EndWallJump();
             }
@@ -81,19 +92,25 @@ namespace WhereIsMyWife.Player.State
             _wallJumpVelocitySubject.OnNext(_horizontalSpeed);
         }
 
-        private bool MinJumpTimeHasPassed()
+        private void StartJumpSpeedCurve()
         {
-            return _timer >= _minWallJumpDuration;
+            _horizontalSpeed = _wallJumpSpeed * _directionMultiplier;
+
+            _horizontalSpeedTween = DOTween.To(() => _horizontalSpeed, x => _horizontalSpeed = x, 
+                    _movementProperties.RunMaxSpeed * _directionMultiplier, 
+                    _timeToNormalSpeed)
+                .SetEase(Ease.InOutSine)
+                .OnComplete(StartDecelerationCurve);
         }
         
-        private bool PlayerChangesDirection()
+        private void StartDecelerationCurve()
         {
-            if (!_stateIndicator.IsAccelerating)
-            {
-                return false;
-            }
-            
-            return _isLookingRightAtStart != _stateIndicator.IsRunningRight;
+            _minTimeHasPassed = true;
+            _horizontalSpeedTween = DOTween.To(() => _horizontalSpeed, x => _horizontalSpeed = x, 
+                    0, 
+                    _timeToZeroSpeed)
+                .SetEase(Ease.InSine)
+                .OnComplete(StartDecelerationCurve);
         }
         
         private void EndWallJump()
