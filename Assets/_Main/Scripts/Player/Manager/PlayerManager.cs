@@ -32,6 +32,7 @@ namespace WhereIsMyWife.Managers
         public bool IsJumping { get; private set; } = false;
         public bool IsJumpCut { get; private set; } = false;
         public bool IsJumpFalling { get; private set; } = false;
+        public bool IsOnWallHang { get; private set; } = false;
         public bool IsRunFalling { get; private set; } = false;
 
         public bool IsOnJumpInputBuffer()
@@ -63,7 +64,7 @@ namespace WhereIsMyWife.Managers
 
         public bool CanJump()
         {
-            return _lastOnGroundTime > 0 && !IsJumping;
+            return (_lastOnGroundTime > 0 && !IsJumping) || IsOnWallHang;
         }
 
         public bool CanJumpCut()
@@ -210,12 +211,14 @@ namespace WhereIsMyWife.Managers
             {
                 if ((IsJumping || IsRunFalling))
                 {
+                    IsOnWallHang = true;
                     _wallHangStartSubject.OnNext();
                 }
             }
 
             else
             {
+                IsOnWallHang = false;
                 _wallHangEndSubject.OnNext();
             }
         }

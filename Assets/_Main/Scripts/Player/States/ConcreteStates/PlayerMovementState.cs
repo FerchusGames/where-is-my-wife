@@ -24,6 +24,8 @@ namespace WhereIsMyWife.Player.State
         private IDisposable _runSubscription;
         private IDisposable _gravityScaleSubscription;
         private IDisposable _fallSpeedCapSubscription;
+        private IDisposable _wallHangStartSubscription;
+        private IDisposable _dashStartSubscription;
         
         private float _runAcceleration;
         
@@ -33,9 +35,8 @@ namespace WhereIsMyWife.Player.State
             _runSubscription = _playerStateInput.Run.Subscribe(_runSubject.OnNext);
             _gravityScaleSubscription = _playerStateInput.GravityScale.Subscribe(_gravityScaleSubject.OnNext);
             _fallSpeedCapSubscription = _playerStateInput.FallSpeedCap.Subscribe(_fallSpeedCapSubject.OnNext);
-
-            _playerStateInput.WallHangStart.Subscribe(WallHang);
-            _playerStateInput.DashStart.AsUnitObservable().Subscribe(Dash);
+            _wallHangStartSubscription = _playerStateInput.WallHangStart.Subscribe(WallHang);
+            _dashStartSubscription = _playerStateInput.DashStart.AsUnitObservable().Subscribe(Dash);
         }
 
         protected override void UnsubscribeToObservables()
@@ -44,6 +45,8 @@ namespace WhereIsMyWife.Player.State
             _runSubscription?.Dispose();
             _gravityScaleSubscription?.Dispose();
             _fallSpeedCapSubscription?.Dispose();
+            _wallHangStartSubscription?.Dispose();
+            _dashStartSubscription?.Dispose();
         }
 
         private void Dash()

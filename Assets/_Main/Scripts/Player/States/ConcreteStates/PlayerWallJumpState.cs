@@ -15,8 +15,17 @@ namespace WhereIsMyWife.Player.State
         public PlayerWallJumpState() : base(PlayerStateMachine.PlayerState.WallJump) { }
 
         private Subject<float> _wallJumpVelocitySubject = new Subject<float>();
-
+        private Subject<float> _gravityScaleSubject = new Subject<float>();
+        private Subject<float> _fallSpeedCapSubject = new Subject<float>();
+        
         public IObservable<float> WallJumpVelocity => _wallJumpVelocitySubject.AsObservable();
+        public IObservable<float> GravityScale => _gravityScaleSubject.AsObservable();
+        public IObservable<float> FallSpeedCap => _fallSpeedCapSubject.AsObservable();
+        
+        private IDisposable _gravityScaleSubscription;
+        private IDisposable _fallSpeedCapSubscription;
+        private IDisposable _landSubscription;
+        private IDisposable _wallHangStartSubscription;
         
         [Inject] private IPlayerMovementProperties _movementProperties;
         [Inject] private IPlayerStateIndicator _stateIndicator;
@@ -24,68 +33,64 @@ namespace WhereIsMyWife.Player.State
         private Tween _horizontalSpeedTween;
         
         private float _horizontalSpeed = 0;
-        private bool _initialFacingDirection;
+        private int _directionMultiplier = 1;
+        private bool _isRunningRightAtStart;
+
+        private float _wallJumpSpeed = 15f;
         
         protected override void SubscribeToObservables()
         {
-           
+            _gravityScaleSubscription = _playerStateInput.GravityScale.Subscribe(_gravityScaleSubject.OnNext);
+            _fallSpeedCapSubscription = _playerStateInput.FallSpeedCap.Subscribe(_fallSpeedCapSubject.OnNext);
+            _landSubscription = _playerStateInput.Land.Subscribe(EndWallJump);
+            _wallHangStartSubscription = _playerStateInput.WallHangStart.Subscribe(WallHang);
         }
 
         protected override void UnsubscribeToObservables()
         {
-            
+            _gravityScaleSubscription?.Dispose();
+            _fallSpeedCapSubscription?.Dispose();
+            _landSubscription?.Dispose();
+            _wallHangStartSubscription?.Dispose();
         }
 
         public override void EnterState()
         {
             base.EnterState();
-            
-            _initialFacingDirection = _stateIndicator.IsRunningRight;
-            
-            StartHorizontalSpeedCurve();
+
+            _isRunningRightAtStart = _stateIndicator.IsRunningRight;
+            _directionMultiplier = _stateIndicator.IsRunningRight ? -1 : 1;
+            _horizontalSpeed = _wallJumpSpeed * _directionMultiplier;
         }
 
         public override void UpdateState()
         {
-            _wallJumpVelocitySubject.OnNext(0f);
-        }
-        
-        private void StartHorizontalSpeedCurve()
-        {
-            _horizontalSpeed = 0;
-            
-            _horizontalSpeedTween = DOTween.To(() => _horizontalSpeed, x => _horizontalSpeed = x, 
-                    -_movementProperties.WallSlideMaxVelocity, 
-                    _movementProperties.WallSlideTimeToMaxVelocity)
-                .SetEase(Ease.InOutSine);
-        }
-
-        public override void ExitState()
-        {
-            base.ExitState();
-
-            KillHorizontalSpeedCurve();
-        }
-
-        private void KillHorizontalSpeedCurve()
-        {
-            if (_horizontalSpeedTween != null && _horizontalSpeedTween.IsActive())
+            if (PlayerChangesDirection())
             {
-                _horizontalSpeedTween.Kill();
+                EndWallJump();
             }
         }
-        
 
-        private bool PlayerIsGoingOppositeDirectionOfWall()
+        public override void FixedUpdateState()
         {
-            return _initialFacingDirection != _stateIndicator.IsRunningRight;
+            _wallJumpVelocitySubject.OnNext(_horizontalSpeed);
         }
         
-        private void EndWallHang()
+        private bool PlayerChangesDirection()
+        {
+            return _isRunningRightAtStart != _stateIndicator.IsRunningRight;
+        }
+        
+        private void EndWallJump()
         {
             NextState = PlayerStateMachine.PlayerState.Movement;
         }
 
+        private void WallHang()
+        {
+            NextState = PlayerStateMachine.PlayerState.WallHang;
+        }
+        
         private void Dash()
         {
             NextState = PlayerStateMachine.PlayerState.Dash;

@@ -7,6 +7,7 @@
         public bool IsJumping { get; }
         public bool IsJumpCut { get; }
         public bool IsJumpFalling { get; }
+        public bool IsOnWallHang { get; }
         public bool IsRunFalling { get; }
         public bool IsOnJumpInputBuffer();
         public bool IsFastFalling();

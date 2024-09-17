@@ -21,6 +21,7 @@ namespace WhereIsMyWife.Controllers
     {
         [Inject] private IMovementStateEvents _movementStateEvents;
         [Inject] private IWallHangStateEvents _wallHangStateEvents;
+        [Inject] private IWallJumpStateEvents _wallJumpStateEvents;
         
         [Inject] private IPlayerStateIndicator _playerStateIndicator;
         [Inject] private IPlayerControllerEvent _playerControllerEvent;
@@ -45,16 +46,18 @@ namespace WhereIsMyWife.Controllers
 
         private void SubscribeToObservables()
         {
-            _movementStateEvents.JumpStart.Subscribe(JumpStart).AddTo(this);
-            
-            // TODO: Subscribe to Run() instead after being called every FixedUpdate
             _movementStateEvents.Run.Subscribe(Run).AddTo(this); 
-            
+            _movementStateEvents.JumpStart.Subscribe(JumpStart).AddTo(this);
             _movementStateEvents.GravityScale.Subscribe(SetGravityScale).AddTo(this);
             _movementStateEvents.FallSpeedCap.Subscribe(SetFallSpeedCap).AddTo(this);
 
             _wallHangStateEvents.WallHangVelocity.Subscribe(WallHangVelocity).AddTo(this);
             _wallHangStateEvents.Turn.Subscribe(Turn).AddTo(this);
+            _wallHangStateEvents.WallJumpStart.Subscribe(JumpStart).AddTo(this);
+
+            _wallJumpStateEvents.WallJumpVelocity.Subscribe(SetHorizontalSpeed).AddTo(this);
+            _wallJumpStateEvents.GravityScale.Subscribe(SetGravityScale).AddTo(this);
+            _wallJumpStateEvents.FallSpeedCap.Subscribe(SetFallSpeedCap).AddTo(this);
             
             _respawn.RespawnAction.Subscribe(Respawn).AddTo(this);
         }
@@ -86,6 +89,11 @@ namespace WhereIsMyWife.Controllers
                 Mathf.Max(_rigidbody2D.velocity.y, -fallSpeedCap));
         }
 
+        private void SetHorizontalSpeed(float speed)
+        {
+            _rigidbody2D.velocity = new Vector2(speed, _rigidbody2D.velocity.y);
+        }
+        
         private void WallHangVelocity(float fallVelocity)
         {
             SetGravityScale(0f);

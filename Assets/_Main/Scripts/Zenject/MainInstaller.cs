@@ -67,6 +67,7 @@ namespace WhereIsMyWife
             Container.BindInterfacesTo<PlayerMovementState>().AsSingle();
             Container.BindInterfacesTo<PlayerDashState>().AsSingle();
             Container.BindInterfacesTo<PlayerWallHangState>().AsSingle();
+            Container.BindInterfacesTo<PlayerWallJumpState>().AsSingle();
         }
     }
 }

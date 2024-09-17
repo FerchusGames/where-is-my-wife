@@ -17,37 +17,47 @@ namespace WhereIsMyWife.Player.State
         private Subject<Unit> _startWallHang = new Subject<Unit>();
         private Subject<float> _wallHangGravitySubject = new Subject<float>();
         private Subject<Unit> _turnSubject = new Subject<Unit>();
-
+        private Subject<float> _wallJumpStartSubject = new Subject<float>();
         public IObservable<Unit> StartWallHang => _startWallHang.AsObservable();
         public IObservable<float> WallHangVelocity => _wallHangGravitySubject.AsObservable();
+        public IObservable<float> WallJumpStart => _wallJumpStartSubject.AsObservable();
         public IObservable<Unit> Turn => _turnSubject.AsObservable();
 
+        private IDisposable _dashStartSubscription;
+        private IDisposable _landSubscription;
+        private IDisposable _wallHangEndSubscription;
+        private IDisposable _wallJumpStartSubscription;
+        
         [Inject] private IPlayerMovementProperties _movementProperties;
         [Inject] private IPlayerStateIndicator _stateIndicator;
         
         private Tween _slideTween;
         
         private float _slideSpeed = 0;
-        private bool _initialFacingDirection;
+        private bool _isRunningRightAtStart;
         
         protected override void SubscribeToObservables()
         {
-            _playerStateInput.DashStart.AsUnitObservable().Subscribe(Dash);
-            _playerStateInput.JumpStart.AsUnitObservable().Subscribe(Jump);
-            _playerStateInput.Land.Subscribe(TurnAndCancelWallHang);
-            _playerStateInput.WallHangEnd.Subscribe(CancelWallHang);
+            _dashStartSubscription = _playerStateInput.DashStart.AsUnitObservable().Subscribe(Dash);
+            _wallJumpStartSubscription = _playerStateInput.JumpStart.Subscribe(Jump);
+            _landSubscription = _playerStateInput.Land.Subscribe(TurnAndCancelWallHang);
+            _wallHangEndSubscription = _playerStateInput.WallHangEnd.Subscribe(CancelWallHang);
+            
         }
 
         protected override void UnsubscribeToObservables()
         {
-            
+            _dashStartSubscription?.Dispose();
+            _wallJumpStartSubscription?.Dispose();
+            _landSubscription?.Dispose();
+            _wallHangEndSubscription?.Dispose();
         }
 
         public override void EnterState()
         {
             base.EnterState();
             
-            _initialFacingDirection = _stateIndicator.IsRunningRight;
+            _isRunningRightAtStart = _stateIndicator.IsRunningRight;
             _startWallHang.OnNext();
             
             StartSlideSpeedCurve();
@@ -90,7 +100,7 @@ namespace WhereIsMyWife.Player.State
 
         private bool PlayerIsGoingOppositeDirectionOfWall()
         {
-            return _initialFacingDirection != _stateIndicator.IsRunningRight;
+            return _isRunningRightAtStart != _stateIndicator.IsRunningRight;
         }
 
         private void TurnAndCancelWallHang()
@@ -110,11 +120,11 @@ namespace WhereIsMyWife.Player.State
             NextState = PlayerStateMachine.PlayerState.Dash;
         }
 
-        private void Jump()
+        private void Jump(float jumpForce)
         {
             _turnSubject.OnNext();
+            _wallJumpStartSubject.OnNext(jumpForce / 1.5f);
             NextState = PlayerStateMachine.PlayerState.WallJump;
         }
-
     }
 }
