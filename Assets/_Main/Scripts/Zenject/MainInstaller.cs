@@ -49,11 +49,18 @@ namespace WhereIsMyWife
 
         private void InstallPlayerPropertiesModules()
         {
-            Container.BindInterfacesTo<PlayerJumpProperties>().FromScriptableObject(_playerProperties.JumpProperties).AsSingle();
-            Container.BindInterfacesTo<PlayerDashProperties>().FromScriptableObject(_playerProperties.DashProperties).AsSingle();
-            Container.BindInterfacesTo<PlayerMovementProperties>().FromScriptableObject(_playerProperties.MovementProperties).AsSingle();
-            Container.BindInterfacesTo<PlayerGravityProperties>().FromScriptableObject(_playerProperties.GravityProperties).AsSingle();
-            Container.BindInterfacesTo<PlayerCheckProperties>().FromScriptableObject(_playerProperties.CheckProperties).AsSingle();
+            Container.BindInterfacesTo<PlayerJumpProperties>()
+                .FromScriptableObject(_playerProperties.JumpProperties).AsSingle();
+            Container.BindInterfacesTo<PlayerDashProperties>()
+                .FromScriptableObject(_playerProperties.DashProperties).AsSingle();
+            Container.BindInterfacesTo<PlayerMovementProperties>()
+                .FromScriptableObject(_playerProperties.MovementProperties).AsSingle();
+            Container.BindInterfacesTo<PlayerGravityProperties>()
+                .FromScriptableObject(_playerProperties.GravityProperties).AsSingle();
+            Container.BindInterfacesTo<PlayerCheckProperties>()
+                .FromScriptableObject(_playerProperties.CheckProperties).AsSingle();
+            Container.BindInterfacesTo<PlayerWallJumpProperties>()
+                .FromScriptableObject(_playerProperties.WallJumpProperties).AsSingle();
         }
 
         private void InstallActionMethods()

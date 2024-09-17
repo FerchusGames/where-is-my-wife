@@ -15,6 +15,6 @@ MonoBehaviour:
   <MovementProperties>k__BackingField: {fileID: 11400000, guid: 8fd7ea673e8b5ff43b36b7a4780f471e, type: 2}
   <JumpProperties>k__BackingField: {fileID: 11400000, guid: 05309a93c8aa2094f9316213aa5f0379, type: 2}
   <DashProperties>k__BackingField: {fileID: 11400000, guid: a6bc620f22c23d840961f7282c96cf83, type: 2}
-  <CombatProperties>k__BackingField: {fileID: 11400000, guid: 3a3684d1f78c454429e6a5641f6b9fd8, type: 2}
   <GravityProperties>k__BackingField: {fileID: 11400000, guid: 8c4d0c2db350b4449a374a5e388d4c06, type: 2}
   <CheckProperties>k__BackingField: {fileID: 11400000, guid: a6f1df6aba9d9e6468ba265c1ece69cb, type: 2}
+  <WallJumpProperties>k__BackingField: {fileID: 11400000, guid: d58112eaeb40f104db267533a48ce42e, type: 2}

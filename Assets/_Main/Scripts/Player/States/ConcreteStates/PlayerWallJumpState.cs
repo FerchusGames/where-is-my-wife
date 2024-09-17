@@ -28,19 +28,13 @@ namespace WhereIsMyWife.Player.State
         private IDisposable _wallHangStartSubscription;
         
         [Inject] private IPlayerMovementProperties _movementProperties;
+        [Inject] private IPlayerWallJumpProperties _wallJumpProperties;
         [Inject] private IPlayerStateIndicator _stateIndicator;
         
         private Tween _horizontalSpeedTween;
         
         private float _horizontalSpeed = 0;
         private int _directionMultiplier = 1;
-        private bool _isLookingRightAtStart;
-
-        private float _timer = 0;
-        private float _minWallJumpDuration = 0.2f;
-        private float _wallJumpSpeed = 15f;
-        private float _timeToNormalSpeed = 0.23f;
-        private float _timeToZeroSpeed = 0.5f;
 
         private bool _minTimeHasPassed = false;
         
@@ -63,10 +57,8 @@ namespace WhereIsMyWife.Player.State
         public override void EnterState()
         {
             base.EnterState();
-
-            _timer = 0;
+            
             _minTimeHasPassed = false;
-            _isLookingRightAtStart = _stateIndicator.IsLookingRight;
             _directionMultiplier = _stateIndicator.IsLookingRight ? 1 : -1;
             StartJumpSpeedCurve();
         }
@@ -87,18 +79,16 @@ namespace WhereIsMyWife.Player.State
 
         public override void FixedUpdateState()
         {
-            _timer += Time.fixedDeltaTime;
-            
             _wallJumpVelocitySubject.OnNext(_horizontalSpeed);
         }
 
         private void StartJumpSpeedCurve()
         {
-            _horizontalSpeed = _wallJumpSpeed * _directionMultiplier;
+            _horizontalSpeed = _wallJumpProperties.WallJumpSpeed * _directionMultiplier;
 
             _horizontalSpeedTween = DOTween.To(() => _horizontalSpeed, x => _horizontalSpeed = x, 
                     _movementProperties.RunMaxSpeed * _directionMultiplier, 
-                    _timeToNormalSpeed)
+                    _wallJumpProperties.TimeToNormalSpeed)
                 .SetEase(Ease.InOutSine)
                 .OnComplete(StartDecelerationCurve);
         }
@@ -108,7 +98,7 @@ namespace WhereIsMyWife.Player.State
             _minTimeHasPassed = true;
             _horizontalSpeedTween = DOTween.To(() => _horizontalSpeed, x => _horizontalSpeed = x, 
                     0, 
-                    _timeToZeroSpeed)
+                    _wallJumpProperties.TimeToZeroSpeed)
                 .SetEase(Ease.InSine)
                 .OnComplete(StartDecelerationCurve);
         }
