@@ -28,7 +28,9 @@ namespace WhereIsMyWife.Managers
     public partial class PlayerManager : IPlayerStateIndicator
     {
         public bool IsDead { get; private set; } = false;
+        public bool IsAccelerating => _runningMethods.GetIsAccelerating();
         public bool IsRunningRight { get; private set; } = true;
+        public bool IsLookingRight => _controllerData.HorizontalScale > 0;
         public bool IsJumping { get; private set; } = false;
         public bool IsJumpCut { get; private set; } = false;
         public bool IsJumpFalling { get; private set; } = false;

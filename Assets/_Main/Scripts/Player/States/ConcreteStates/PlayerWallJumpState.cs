@@ -34,8 +34,10 @@ namespace WhereIsMyWife.Player.State
         
         private float _horizontalSpeed = 0;
         private int _directionMultiplier = 1;
-        private bool _isRunningRightAtStart;
+        private bool _isLookingRightAtStart;
 
+        private float _timer = 0;
+        private float _minWallJumpDuration = 0.2f;
         private float _wallJumpSpeed = 15f;
         
         protected override void SubscribeToObservables()
@@ -58,14 +60,15 @@ namespace WhereIsMyWife.Player.State
         {
             base.EnterState();
 
-            _isRunningRightAtStart = _stateIndicator.IsRunningRight;
-            _directionMultiplier = _stateIndicator.IsRunningRight ? -1 : 1;
+            _timer = 0;
+            _isLookingRightAtStart = _stateIndicator.IsLookingRight;
+            _directionMultiplier = _stateIndicator.IsLookingRight ? 1 : -1;
             _horizontalSpeed = _wallJumpSpeed * _directionMultiplier;
         }
 
         public override void UpdateState()
         {
-            if (PlayerChangesDirection())
+            if (PlayerChangesDirection() && MinJumpTimeHasPassed())
             {
                 EndWallJump();
             }
@@ -73,12 +76,24 @@ namespace WhereIsMyWife.Player.State
 
         public override void FixedUpdateState()
         {
+            _timer += Time.fixedDeltaTime;
+            
             _wallJumpVelocitySubject.OnNext(_horizontalSpeed);
+        }
+
+        private bool MinJumpTimeHasPassed()
+        {
+            return _timer >= _minWallJumpDuration;
         }
         
         private bool PlayerChangesDirection()
         {
-            return _isRunningRightAtStart != _stateIndicator.IsRunningRight;
+            if (!_stateIndicator.IsAccelerating)
+            {
+                return false;
+            }
+            
+            return _isLookingRightAtStart != _stateIndicator.IsRunningRight;
         }
         
         private void EndWallJump()

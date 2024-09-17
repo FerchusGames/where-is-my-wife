@@ -34,7 +34,7 @@ namespace WhereIsMyWife.Player.State
         private Tween _slideTween;
         
         private float _slideSpeed = 0;
-        private bool _isRunningRightAtStart;
+        private bool _isLookingRightAtStart;
         
         protected override void SubscribeToObservables()
         {
@@ -57,7 +57,7 @@ namespace WhereIsMyWife.Player.State
         {
             base.EnterState();
             
-            _isRunningRightAtStart = _stateIndicator.IsRunningRight;
+            _isLookingRightAtStart = _stateIndicator.IsLookingRight;
             _startWallHang.OnNext();
             
             StartSlideSpeedCurve();
@@ -100,7 +100,12 @@ namespace WhereIsMyWife.Player.State
 
         private bool PlayerIsGoingOppositeDirectionOfWall()
         {
-            return _isRunningRightAtStart != _stateIndicator.IsRunningRight;
+            if (!_stateIndicator.IsAccelerating)
+            {
+                return false;
+            }
+            
+            return _isLookingRightAtStart != _stateIndicator.IsRunningRight;
         }
 
         private void TurnAndCancelWallHang()

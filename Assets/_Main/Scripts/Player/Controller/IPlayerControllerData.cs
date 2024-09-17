@@ -8,5 +8,6 @@ namespace WhereIsMyWife.Controllers
         public Vector2 GroundCheckPosition { get; }
         public Vector2 WallHangCheckUpPosition { get; }
         public Vector2 WallHangCheckDownPosition { get; }
+        public float HorizontalScale { get; }
     }
 }

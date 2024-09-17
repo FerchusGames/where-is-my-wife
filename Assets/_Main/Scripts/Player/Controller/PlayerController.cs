@@ -15,6 +15,7 @@ namespace WhereIsMyWife.Controllers
         public Vector2 GroundCheckPosition => _groundCheckTransform.position;
         public Vector2 WallHangCheckUpPosition => _wallHangCheckUpTransform.position;
         public Vector2 WallHangCheckDownPosition => _wallHangCheckDownTransform.position;
+        public float HorizontalScale => transform.localScale.x;
     }
     
     public partial class PlayerController : MonoBehaviour
