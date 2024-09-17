@@ -36,6 +36,8 @@ namespace WhereIsMyWife.Managers
         
         private Vector2 _moveVector = Vector2.zero;
         
+        private float _horizontalDeadZone = 0.5f;
+        
         public void Initialize()
         {
             _playerInputActions.Enable();
@@ -67,6 +69,9 @@ namespace WhereIsMyWife.Managers
         {
             _moveVector = context.ReadValue<Vector2>();
 
+            ApplyHorizontalDeadZone();
+            NormalizeHorizontalAxis();
+            
             if (_moveVector.y < 0)
             {
                 _lookDownSubject.OnNext(true);
@@ -76,6 +81,21 @@ namespace WhereIsMyWife.Managers
             {
                 _lookDownSubject.OnNext(false);
             }
+        }
+
+        private void ApplyHorizontalDeadZone()
+        {
+            if (Mathf.Abs(_moveVector.x) < _horizontalDeadZone)
+            {
+                _moveVector.x = 0;
+            }
+        }
+
+        private void NormalizeHorizontalAxis()
+        {
+            if (_moveVector.x == 0) return;
+            
+            _moveVector.x = Mathf.Sign(_moveVector.x);
         }
 
         private void OnMoveCancel(InputAction.CallbackContext context)
