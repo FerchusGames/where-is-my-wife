@@ -6,6 +6,7 @@
         public bool IsAccelerating { get; }
         public bool IsRunningRight { get; }
         public bool IsLookingRight { get; }
+        public bool IsLookingDown { get; }
         public bool IsJumping { get; }
         public bool IsJumpCut { get; }
         public bool IsJumpFalling { get; }

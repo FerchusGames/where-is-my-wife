@@ -61,13 +61,21 @@ namespace WhereIsMyWife.Controllers
                     PlayAnimationState(FALL_ANIMATION_STATE);
                 }
                 
-                else if (Mathf.Abs(_rigidbody2D.velocity.x) >= 1f)
+                else if (_stateIndicator.IsAccelerating)
                 {
                     PlayAnimationState(RUN_ANIMATION_STATE);
                 }
+                
                 else
                 {
-                    PlayAnimationState(IDLE_ANIMATION_STATE);
+                    if (_stateIndicator.IsLookingDown)
+                    {
+                        PlayAnimationState(CROUCH_ANIMATION_STATE);
+                    }
+                    else
+                    {
+                        PlayAnimationState(IDLE_ANIMATION_STATE);
+                    }
                 }
                 
             }

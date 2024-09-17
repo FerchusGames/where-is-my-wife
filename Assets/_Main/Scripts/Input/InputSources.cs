@@ -14,7 +14,7 @@ namespace WhereIsMyWife.Managers
         IObservable<Unit> HookStartAction { get; }
         IObservable<Unit> HookEndAction { get; }
         IObservable<Unit> LookUpAction { get; }
-        IObservable<Unit> GoDownAction { get; }
+        IObservable<bool> LookDownAction { get; }
     }
     
     public enum ControllerType

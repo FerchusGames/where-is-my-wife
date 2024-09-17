@@ -17,7 +17,7 @@ namespace WhereIsMyWife.Managers
         private readonly Subject<Unit> _hookStartSubject = new Subject<Unit>();
         private readonly Subject<Unit> _hookEndSubject = new Subject<Unit>();
         private readonly Subject<Unit> _lookUpSubject = new Subject<Unit>();
-        private readonly Subject<Unit> _goDownSubject = new Subject<Unit>();
+        private readonly Subject<bool> _lookDownSubject = new Subject<bool>();
 
         public IObservable<Unit> JumpStartAction => _jumpStartSubject.AsObservable();
         public IObservable<Unit> JumpEndAction => _jumpEndSubject.AsObservable();
@@ -27,7 +27,7 @@ namespace WhereIsMyWife.Managers
         public IObservable<Unit> HookStartAction => _hookStartSubject.AsObservable();
         public IObservable<Unit> HookEndAction => _hookEndSubject.AsObservable();
         public IObservable<Unit> LookUpAction => _lookUpSubject.AsObservable();
-        public IObservable<Unit> GoDownAction => _goDownSubject.AsObservable();
+        public IObservable<bool> LookDownAction => _lookDownSubject.AsObservable();
     }
 
     public partial class InputEventManager : IInitializable
@@ -69,13 +69,19 @@ namespace WhereIsMyWife.Managers
 
             if (_moveVector.y < 0)
             {
-                _goDownSubject.OnNext();
+                _lookDownSubject.OnNext(true);
+            }
+
+            else
+            {
+                _lookDownSubject.OnNext(false);
             }
         }
 
         private void OnMoveCancel(InputAction.CallbackContext context)
         {
             _moveVector = Vector2.zero;
+            _lookDownSubject.OnNext(false);
         }
 
         private void OnDash(InputAction.CallbackContext context)

@@ -18,7 +18,6 @@ namespace WhereIsMyWife.Managers
         // Movement
         private float _accelerationRate = 0;
         private float _targetSpeed = 0;
-        private bool _isGoingDown = false;
         
         // Timers
         private float _lastOnGroundTime = 0;
@@ -31,6 +30,7 @@ namespace WhereIsMyWife.Managers
         public bool IsAccelerating => _runningMethods.GetIsAccelerating();
         public bool IsRunningRight { get; private set; } = true;
         public bool IsLookingRight => _controllerData.HorizontalScale > 0;
+        public bool IsLookingDown { get; private set; }
         public bool IsJumping { get; private set; } = false;
         public bool IsJumpCut { get; private set; } = false;
         public bool IsJumpFalling { get; private set; } = false;
@@ -49,7 +49,7 @@ namespace WhereIsMyWife.Managers
 
         public bool IsFastFalling()
         {
-            return _controllerData.RigidbodyVelocity.y < 0 && _isGoingDown;
+            return _controllerData.RigidbodyVelocity.y < 0 && IsLookingDown;
         }
         
         public bool IsInJumpHang()
@@ -123,9 +123,9 @@ namespace WhereIsMyWife.Managers
             _dashStartSubject.OnNext(dashDirection * _properties.Dash.Speed);
         }
 
-        private void ExecuteGoDownEvent()
+        private void ExecuteLookDownEvent(bool isLookingDown)
         {
-            _isGoingDown = true;
+            IsLookingDown = isLookingDown;
         }
     }
 
@@ -154,7 +154,7 @@ namespace WhereIsMyWife.Managers
             _playerInputEvent.JumpEndAction.Subscribe(ExecuteJumpEndEvent);
             _playerInputEvent.RunAction.Subscribe(ExecuteRunEvent);
             _playerInputEvent.DashAction.Subscribe(ExecuteDashStartEvent);
-            _playerInputEvent.GoDownAction.Subscribe(ExecuteGoDownEvent);
+            _playerInputEvent.LookDownAction.Subscribe(ExecuteLookDownEvent);
         }
     }
 
@@ -319,8 +319,6 @@ namespace WhereIsMyWife.Managers
             {
                 SetGravityScale(_properties.Gravity.Scale);
             }
-
-            _isGoingDown = false;
         }
 
         private void SetFallSpeedCap(float fallSpeedCap)
